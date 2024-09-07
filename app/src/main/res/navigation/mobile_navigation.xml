@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_chatbot">
+
+    <fragment
+        android:id="@+id/navigation_chatbot"
+        android:name="com.example.mentalcare.ui.chatbot.ChatBotFragment"
+        android:label="챗봇"
+        tools:layout="@layout/fragment_chatbot" />
+    <fragment
+        android:id="@+id/navigation_diary"
+        android:name="com.example.mentalcare.ui.diary.DiaryFragment"
+        android:label="감정일기"
+        tools:layout="@layout/fragment_diary" />
+    <fragment
+        android:id="@+id/navigation_community"
+        android:name="com.example.mentalcare.ui.community.CommunityFragment"
+        android:label="커뮤니티"
+        tools:layout="@layout/fragment_community" />
+    <fragment
+        android:id="@+id/navigation_mypage"
+        android:name="com.example.mentalcare.ui.mypage.MyPageFragment"
+        android:label="마이페이지"
+        tools:layout="@layout/fragment_mypage" />
+</navigation>
