@@ -1,8 +1,8 @@
 const express = require('express');
-const { diaryController } = require('../controllers/diary');
+const { analyzeDiary } = require('../controllers/diary');
 
 const router = express.Router();
 
-router.post('/analyze', diaryController)
+router.post('/analyze', analyzeDiary)
 
 module.exports = router;
