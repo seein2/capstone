@@ -69,16 +69,7 @@ app.get('/settings', (req, res) => {
 
 // 홈 경로
 app.get('/', (req, res) => {
-    res.send(`
-        <html>
-        <head>
-        </head>
-        <body>
-            <h1>로컬 서버에서 실행 중입니다.</h1>
-            <button onclick="window.location.href='/kakao_login.html'">로그인 페이지로 이동</button>
-        </body>
-        </html>
-    `);
+    res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // 서버 시작
