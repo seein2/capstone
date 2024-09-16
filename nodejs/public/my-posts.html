@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 게시물 목록</title>
+    <style>
+        /* 게시물 스타일 추가 */
+        .post-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .edit-form {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>내가 작성한 게시물 목록</h1>
+
+    <!-- 사용자 설정으로 돌아가는 버튼 -->
+    <button onclick="window.location.href='/settings.html';">돌아가기</button>
+
+    <!-- 내 게시물 목록 -->
+    <div id="my-post-list"></div>
+
+    <script>
+        // 내가 작성한 게시물 목록 조회
+        function loadMyPosts() {
+            fetch('/community/my-posts')
+                .then(response => {
+                    if (!response.ok) throw new Error('게시물 불러오기 실패');
+                    return response.json();
+                })
+                .then(posts => {
+                    const postList = document.getElementById('my-post-list');
+                    postList.innerHTML = ''; // 기존 목록 초기화
+
+                    if (posts.length === 0) {
+                        postList.innerHTML = '<p>작성한 게시물이 없습니다.</p>';
+                    } else {
+                        posts.forEach(post => {
+                            const postElement = document.createElement('div');
+                            postElement.classList.add('post-item');
+                            postElement.innerHTML = `
+                                <h3>${post.title}</h3>
+                                <p>${post.content}</p>
+                                <button onclick="showEditForm(${post.id})">수정</button>
+                                <button onclick="deletePost(${post.id})">삭제</button>
+                                <div id="edit-form-${post.id}" class="edit-form" style="display:none;">
+                                    <input type="text" id="edit-title-${post.id}" value="${post.title}">
+                                    <textarea id="edit-content-${post.id}">${post.content}</textarea>
+                                    <button onclick="submitPostEdit(${post.id})">수정 완료</button>
+                                    <button onclick="cancelEdit(${post.id})">취소</button>
+                                </div>
+                            `;
+                            postList.appendChild(postElement);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('게시물 불러오기 오류:', error);
+                    alert('게시물을 불러오는 중 문제가 발생했습니다.');
+                });
+        }
+
+        // 게시물 수정 폼 표시
+        function showEditForm(postId) {
+            document.getElementById(`edit-form-${postId}`).style.display = 'block'; // 수정 폼 표시
+        }
+
+        // 게시물 수정 취소
+        function cancelEdit(postId) {
+            document.getElementById(`edit-form-${postId}`).style.display = 'none'; // 수정 폼 숨김
+        }
+
+        // 게시물 수정 제출
+        function submitPostEdit(postId) {
+            const updatedTitle = document.getElementById(`edit-title-${postId}`).value;
+            const updatedContent = document.getElementById(`edit-content-${postId}`).value;
+
+            if (!updatedTitle || !updatedContent) {
+                alert('제목과 내용을 입력하세요.');
+                return;
+            }
+
+            fetch(`/community/posts/${postId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: updatedTitle,
+                    content: updatedContent
+                }),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('게시물 수정 실패');
+                return response.json();
+            })
+            .then(data => {
+                alert('게시물이 성공적으로 수정되었습니다.');
+                loadMyPosts(); // 수정 후 목록 갱신
+            })
+            .catch(error => {
+                console.error('게시물 수정 오류:', error);
+                alert('게시물 수정 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 게시물 삭제 기능
+        function deletePost(postId) {
+            if (confirm('게시물을 삭제하시겠습니까?')) {
+                fetch(`/community/posts/${postId}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (!response.ok) throw new Error('게시물 삭제 실패');
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        loadMyPosts(); // 삭제 후 목록 갱신
+                    })
+                    .catch(error => {
+                        console.error('게시물 삭제 오류:', error);
+                        alert('게시물 삭제 중 오류가 발생했습니다.');
+                    });
+            }
+        }
+
+        window.onload = loadMyPosts; // 페이지 로드 시 내가 작성한 게시물 목록 불러오기
+    </script>
+</body>
+</html>

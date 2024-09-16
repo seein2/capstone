@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 설정</title>
+</head>
+
+<body>
+    <h1>사용자 설정</h1>
+
+    <!-- 프로필 변경 버튼 -->
+    <button onclick="window.location.href='/profile_edit.html';">프로필 변경</button>
+
+    <!-- 내 게시물 보기 버튼 -->
+    <button onclick="window.location.href='/my-posts.html';">내 게시물 보기</button>
+
+    <!-- 로그아웃 버튼 추가 -->
+    <button onclick="logout()" class="button">로그아웃</button>
+
+    <!-- 커뮤니티로 돌아가기 버튼 -->
+    <button onclick="window.location.href='/community.html';">커뮤니티로 돌아가기</button>
+
+    <!-- 회원 탈퇴 버튼 -->
+    <button onclick="deleteAccount()">회원탈퇴</button>
+
+    <script>
+        function logout() {
+            const baseUrl = window.location.hostname === 'localhost'
+                ? 'http://localhost:3000'
+                : 'https://9e5b-58-76-26-176.ngrok-free.app'; // ngrok 주소 사용
+
+            fetch(baseUrl + '/auth/logout', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = baseUrl + '/kakao_login.html';
+                    } else {
+                        console.error('Logout failed with status:', response.status);
+                        window.location.href = baseUrl + '/kakao_login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    alert('로그아웃 중 문제가 발생했습니다.');
+                });
+        }
+
+        function deleteAccount() {
+            if (confirm('정말로 회원탈퇴 하시겠습니까?')) {
+                fetch(baseUrl + '/auth/delete-account', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            alert(data.message);
+                            window.location.href = baseUrl + '/kakao_login.html';  // 탈퇴 후 로그인 페이지로 리디렉션
+                        }
+                    })
+                    .catch(error => {
+                        console.error('회원탈퇴 중 오류 발생:', error);
+                        alert('회원탈퇴 중 오류가 발생했습니다.');
+                    });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

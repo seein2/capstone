@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 게시판</title>
+    <style>
+        /* 게시물 요소에 경계선 및 간격 추가 */
+        .post-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .comment-item {
+            border-top: 1px solid #ccc;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>커뮤니티 게시판</h1>
+
+    <!-- 검색 기능 -->
+    <input type="text" id="search-keyword" placeholder="검색어 입력">
+    <button onclick="searchPosts()">검색</button>
+
+    <!-- 사용자 설정 링크 -->
+    <button onclick="window.location.href='/settings.html';">사용자 설정</button>
+    <br><br><br>
+
+    <!-- 새로고침 버튼 -->
+    <button onclick="refreshPage()">새로고침</button>
+
+    <!-- 게시물 작성 링크 -->
+    <button onclick="window.location.href='/post_create.html';">게시물 작성</button>
+
+    <br><br><br>
+
+    <!-- 게시물 목록 -->
+    <div id="post-list"></div>
+    <div id="pagination"></div>
+
+    <script>
+        let currentPage = 1;
+        const limit = 10;
+        let userId = null;  // 기본값을 null로 설정
+        let isAdmin = false; // 기본값을 false로 설정
+
+        // JWT 토큰 확인 함수
+        function checkToken() {
+            const token = localStorage.getItem('token'); // 토큰을 로컬 스토리지에서 가져옴
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/kakao_login.html';  // 로그인 페이지로 리디렉션
+                return false; // 토큰이 없으면 false 반환
+            }
+
+            // 토큰 유효성 확인을 위한 API 요청
+            return fetch('/auth/verify-token', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,  // 토큰을 Authorization 헤더에 포함
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('토큰 검증 실패');
+                    }
+                    return response.json(); // 서버에서 받은 데이터 처리
+                })
+                .then(data => {
+                    console.log('토큰 검증 성공:', data);
+                    return true; // 토큰이 유효한 경우 true 반환
+                })
+                .catch(error => {
+                    console.error('토큰 검증 오류:', error);
+                    alert('인증이 필요합니다. 다시 로그인 해주세요.');
+                    window.location.href = '/kakao_login.html';  // 로그인 페이지로 리디렉션
+                    return false; // 토큰 검증 실패 시 false 반환
+                });
+        }
+
+        // 사용자 정보 및 게시물 목록 로드
+        async function loadPage() {
+            const isTokenValid = await checkToken();
+            if (!isTokenValid) return; // 토큰이 유효하지 않으면 중단
+
+            fetch('/profile/user-info', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`, // JWT 토큰을 포함
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('사용자 정보 요청에 실패했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    userId = data.userId;
+                    isAdmin = data.isAdmin;
+                    loadPosts(currentPage); // 사용자 정보를 받은 후 게시물 목록을 로드
+                })
+                .catch(error => {
+                    console.error('사용자 정보를 불러오는 중 오류 발생:', error);
+                    document.getElementById('post-list').innerHTML = '로그인이 필요합니다.';
+                });
+        }
+
+        // 게시물 목록 조회
+        function loadPosts(page = 1) {
+            fetch(`/community/posts?page=${page}&limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayPosts(data.posts);
+                })
+                .catch(error => {
+                    console.error('게시물 목록을 불러오는 중 오류 발생:', error);
+                });
+        }
+
+        // 게시물 목록을 화면에 출력
+        function displayPosts(posts) {
+            const postList = document.getElementById('post-list');
+            postList.innerHTML = ''; // 기존 게시물 목록을 초기화
+
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('post-item');
+                postElement.innerHTML = `
+                    <div data-post-id="${post.id}">
+                    <h3>${post.title}
+                    - ♥ : <span class="like-count">${post.likeCount}</span> 
+                    
+                    <button onclick="toggleLike(${post.id})">좋아요</button>
+                    <button onclick="deletePost(${post.id})" style="${post.userId === userId || isAdmin ? '' : 'display:none;'}">삭제</button>
+                    <button onclick="toggleEditPostForm(${post.id})" ${post.userId === userId || isAdmin ? '' : 'style="display:none;"'}>수정</button> 
+                    </h3>
+                    작성자 : ${post.nickname || '알 수 없음'}<br>
+                    <p>${post.content}</p><br>
+                    </div>
+                    <div id="edit-post-form-${post.id}" style="display:none;">
+                        <input type="text" id="edit-title-${post.id}" value="${post.title}" placeholder="제목 수정"><br>
+                        <textarea id="edit-content-${post.id}" placeholder="내용 수정">${post.content}</textarea>
+                        <button onclick="submitPostEdit(${post.id})">수정 완료</button>
+                    </div>
+                    <div>
+                        <input type="text" id="comment-input-${post.id}" placeholder="댓글을 입력하세요" />
+                        <button onclick="addComment(${post.id})">댓글 달기</button>
+                    </div>
+                    <div id="comment-list-${post.id}"></div>
+                `;
+                postList.appendChild(postElement);
+                loadComments(post.id); // 댓글 목록 로드
+            });
+        }
+
+        // 게시물 삭제 기능
+        function deletePost(postId) {
+            if (confirm('게시물을 삭제하시겠습니까?')) {
+                fetch(`/community/posts/${postId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        loadPosts(currentPage); // 삭제 후 게시물 목록 갱신
+                    })
+                    .catch(error => {
+                        console.error('게시물 삭제 중 오류 발생:', error);
+                    });
+            }
+        }
+
+        // 게시물 검색 기능
+        function searchPosts() {
+            const keyword = document.getElementById('search-keyword').value;
+
+            if (!keyword) {
+                alert('검색어를 입력하세요.');
+                return;
+            }
+
+            fetch(`/community/posts/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('서버에서 검색 처리 중 오류 발생');
+                    }
+                    return response.json();
+                })
+                .then(posts => {
+                    const postList = document.getElementById('post-list');
+                    postList.innerHTML = ''; // 기존 게시물 목록 초기화
+
+                    if (posts.length === 0) {
+                        postList.innerHTML = '<p>검색 결과가 없습니다.</p>';
+                    } else {
+                        posts.forEach(post => {
+                            const postElement = document.createElement('div');
+                            postElement.innerHTML = `
+                                <h3>${post.title}</h3>
+                                <p>${post.content}</p>
+                                <p>작성일: ${post.createdAt}</p>
+                            `;
+                            postList.appendChild(postElement);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('검색 중 오류 발생:', error);
+                    alert('검색 중 오류가 발생했습니다.');
+                });
+        }
+
+        // 게시물 수정 폼 토글 기능
+        function toggleEditPostForm(postId) {
+            const editForm = document.getElementById(`edit-post-form-${postId}`);
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 게시물 수정 제출 기능
+        function submitPostEdit(postId) {
+            const updatedTitle = document.getElementById(`edit-title-${postId}`).value;
+            const updatedContent = document.getElementById(`edit-content-${postId}`).value;
+
+            fetch(`/community/posts/${postId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: updatedTitle, content: updatedContent })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('게시물 수정 권한이 없습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message || '게시물이 수정되었습니다.');
+                    loadPosts(currentPage); // 수정 후 게시물 목록 갱신
+                })
+                .catch(error => {
+                    alert('게시물 수정 중 오류가 발생했습니다.');
+                    console.error('게시물 수정 중 오류:', error);
+                });
+        }
+
+        // 게시물 좋아요 기능
+        function toggleLike(postId) {
+            fetch(`/community/posts/${postId}/like`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    loadPosts(currentPage); // 좋아요 변경 후 게시물 목록 갱신
+                })
+                .catch(error => {
+                    console.error('좋아요 처리 중 오류가 발생했습니다:', error);
+                });
+        }
+
+        // 댓글 목록 조회 및 표시
+        function loadComments(postId) {
+            fetch(`/community/posts/${postId}/comments`)
+                .then(response => response.json())
+                .then(comments => {
+                    const commentList = document.getElementById(`comment-list-${postId}`);
+                    commentList.innerHTML = ''; // 기존 댓글 목록 초기화
+
+                    comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.classList.add('comment-item');
+                        commentElement.innerHTML = `
+                    <p>${comment.content} - 작성자: ${comment.nickname || '알 수 없음'}</p>
+                        <button onclick="toggleCommentLike(${comment.id}, ${postId})">좋아요</button>
+                        <span id="like-count-${comment.id}"> ♥ : ${comment.likeCount || 0}</span>
+                        <button onclick="toggleEditCommentForm(${comment.id})" ${comment.userId === userId || isAdmin ? '' : 'style="display:none;"'}>수정</button>
+                        <button onclick="deleteComment(${comment.id}, ${postId})" ${comment.userId === userId || isAdmin ? '' : 'style="display:none;"'}>삭제</button>
+                        <div id="edit-comment-form-${comment.id}" style="display:none;">
+                            <textarea id="edit-comment-content-${comment.id}">${comment.content}</textarea>
+                            <button onclick="submitCommentEdit(${comment.id}, ${postId})">수정 완료</button>
+                        </div>
+                   `;
+                        commentList.appendChild(commentElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('댓글 불러오기 오류:', error);
+                });
+        }
+
+        // 댓글 작성 기능
+        function addComment(postId) {
+            const content = document.getElementById(`comment-input-${postId}`).value;
+            if (!content) {
+                alert("댓글 내용을 입력하세요.");
+                return;
+            }
+            fetch(`/community/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('댓글이 작성되었습니다.');
+                    loadComments(postId); // 댓글 작성 후 댓글 목록 갱신
+                })
+                .catch(error => {
+                    console.error('댓글 작성 중 오류:', error);
+                    alert('댓글 작성 중 오류가 발생했습니다.');
+                });
+        }
+
+        // 댓글 삭제 함수
+        function deleteComment(commentId, postId) {
+            if (confirm('댓글을 삭제하시겠습니까?')) {
+                fetch(`/community/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('댓글 삭제 중 오류가 발생했습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        loadComments(postId); // 댓글 삭제 후 목록 갱신
+                    })
+                    .catch(error => {
+                        console.error('댓글 삭제 중 오류 발생:', error);
+                        alert('댓글 삭제 중 오류가 발생했습니다.');
+                    });
+            }
+        }
+
+        // 댓글 수정 폼 토글 기능
+        function toggleEditCommentForm(commentId) {
+            const editForm = document.getElementById(`edit-comment-form-${commentId}`);
+            if (editForm) {
+                editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+            } else {
+                console.error(`edit-comment-form-${commentId} 요소를 찾을 수 없습니다.`);
+            }
+        }
+
+        // 댓글 수정 제출 기능
+        function submitCommentEdit(commentId, postId) {
+            const updatedContent = document.getElementById(`edit-comment-content-${commentId}`).value;
+
+            if (!updatedContent) {
+                alert("댓글 내용을 입력하세요.");
+                return;
+            }
+
+            fetch(`/community/comments/${commentId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: updatedContent })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('댓글이 수정되었습니다.');
+                        loadComments(postId); // 수정 완료 후 댓글 목록 갱신
+                    } else {
+                        alert('댓글 수정 중 오류 발생');
+                    }
+                })
+                .catch(error => {
+                    console.error('댓글 수정 오류:', error);
+                    alert('댓글 수정 중 오류가 발생했습니다.');
+                });
+        }
+
+        // 댓글 좋아요 기능 함수
+        function toggleCommentLike(commentId, postId) {
+            fetch(`/community/comments/${commentId}/like`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const likeCountElement = document.getElementById(`like-count-${commentId}`);
+                        if (likeCountElement) {
+                            likeCountElement.textContent = ` ♥ : ${data.likeCount}`;
+                        } else {
+                            console.error(`like-count-${commentId} 요소를 찾을 수 없습니다.`);
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('좋아요 처리 오류:', error);
+                });
+        }
+
+
+        // 새로고침 함수
+        function refreshPage() {
+            location.reload(); // 페이지 새로고침
+        }
+
+        window.onload = loadPage; // 첫 로드 시 전체 게시물 목록 조회
+    </script>
+</body>
+
+</html>
