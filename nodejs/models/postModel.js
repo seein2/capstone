@@ -1,11 +1,13 @@
 const db = require('../config/db');
 
+// 게시물 정보 가져오기
 const Post = {
   getAllWithPaging: ({ limit, offset }) => {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT posts.*, users.community_nickname AS nickname,
-            (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount
+            (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount,
+            (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount
         FROM posts
         JOIN users ON posts.userId = users.id
         ORDER BY posts.created_at DESC
@@ -129,11 +131,11 @@ const Post = {
 
 Post.getOwner = (postId) => {
   return new Promise((resolve, reject) => {
-      const sql = 'SELECT users.fcmToken FROM posts JOIN users ON posts.userId = users.id WHERE posts.id = ?';
-      db.query(sql, [postId], (err, results) => {
-          if (err) return reject(err);
-          resolve(results[0]);  // 게시물 소유자의 FCM 토큰 반환
-      });
+    const sql = 'SELECT users.fcmToken FROM posts JOIN users ON posts.userId = users.id WHERE posts.id = ?';
+    db.query(sql, [postId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0]);  // 게시물 소유자의 FCM 토큰 반환
+    });
   });
 };
 

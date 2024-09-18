@@ -19,11 +19,23 @@ exports.getProfile = (req, res) => {
     });
 };
 
-// 프로필 설정 페이지 렌더링
+// 프로필 설정 페이지 렌더링 및 API 처리
 exports.getProfileSetup = (req, res) => {
     if (!req.isAuthenticated()) {
-        return res.redirect('/kakao_login.html');
+        // 클라이언트가 AJAX 또는 앱 요청인 경우 JSON으로 처리
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.status(401).json({ error: '로그인이 필요합니다.' });
+        } else {
+            return res.redirect('/kakao_login.html'); // 웹 브라우저인 경우 리디렉트
+        }
     }
+
+    // 앱 요청인 경우 JSON 응답
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        return res.json({ message: '프로필 설정이 필요합니다.' });
+    }
+
+    // 웹 브라우저인 경우 HTML 파일 응답
     res.sendFile(path.join(__dirname, '..', 'public', 'profile_setup.html'));
 };
 

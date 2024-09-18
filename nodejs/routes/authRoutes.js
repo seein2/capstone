@@ -6,8 +6,6 @@ const { ensureAuthenticated } = require('../middleware/authMiddleware'); // 미�
 // 카카오 인증 후 사용자 정보를 저장하는 경로
 router.post('/kakao/callback', authController.kakaoCallback);
 
-// Access 토큰 갱신 처리
-router.post('/token', authController.refreshToken);
 
 // 새로운 토큰 검증 라우트 추가
 router.post('/verify-token', authController.verifyToken);

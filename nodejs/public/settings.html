@@ -29,7 +29,7 @@
         function logout() {
             const baseUrl = window.location.hostname === 'localhost'
                 ? 'http://localhost:3000'
-                : 'https://9e5b-58-76-26-176.ngrok-free.app'; // ngrok 주소 사용
+                : 'https://1c4c-106-101-10-23.ngrok-free.app'; // ngrok 주소 사용
 
             fetch(baseUrl + '/auth/logout', { method: 'POST' })
                 .then(response => {

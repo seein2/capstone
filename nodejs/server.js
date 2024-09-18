@@ -69,10 +69,19 @@ app.get('/settings', (req, res) => {
 
 // 홈 경로
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'main.html'));
+    res.send(`
+        <html>
+        <head>
+        </head>
+        <body>
+            <h1>로컬 서버에서 실행 중입니다.</h1>
+            <button onclick="window.location.href='/kakao_login.html'">로그인 페이지로 이동</button>
+        </body>
+        </html>
+    `);
 });
 
-// 서버 시작
-app.listen(port, () => {
-    console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
+// 서버시작
+app.listen(port, '0.0.0.0', () => {
+    console.log(`서버가 http://0.0.0.0:${port} 에서 실행 중입니다.`);
 });
