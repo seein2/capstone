@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 설정</title>
+</head>
+<body>
+    <h1>프로필 설정</h1>
+    <form id="profileForm">
+        <label for="nickname">닉네임:</label>
+        <input type="text" id="nickname" name="nickname" required><br>
+        <label for="icon">아이콘 URL:</label>
+        <input type="text" id="icon" name="icon" required><br>
+        <button type="submit">저장</button>
+    </form>
+
+    <script>
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nickname = document.getElementById('nickname').value.trim();
+            const icon = document.getElementById('icon').value.trim();
+
+            if (!nickname) {
+                alert('닉네임을 입력해주세요.');
+                return;
+            }
+
+            fetch('profile/profile/setup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nickname, icon })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/community.html';
+                } else {
+                    alert('프로필 설정 실패');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kakao 로그인</title>
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script>
+        // Kakao 앱 키 초기화
+        Kakao.init('d9311df67c81776a8dae575570fdd7f7');
+        console.log(Kakao.isInitialized());  // 초기화 확인
+    </script>
+</head>
+
+<body>
+    <h1>Kakao 로그인</h1>
+    <div id="kakao-login-btn"></div> <!-- 로그인 버튼 컨테이너 -->
+
+    <script>
+        // 환경에 따라 baseUrl 설정
+        const baseUrl = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : 'https://9e5b-58-76-26-176.ngrok-free.app';  // 실제 ngrok 주소 입력
+
+        // 로그인 성공 후 처리 함수
+        function handleLoginSuccess(authObj) {
+            console.log('로그인 성공:', authObj);
+            console.log('Access Token:', authObj.access_token);
+
+            // 로그인 성공 후 백엔드 서버에 액세스 토큰 전송
+            fetch(baseUrl + '/auth/kakao/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ accessToken: authObj.access_token }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                return response.json();  // 서버에서 JWT 토큰을 JSON으로 반환
+            })
+            .then(data => {
+                console.log('서버로부터 받은 데이터:', data);
+                
+                // JWT 토큰과 리프레시 토큰을 로컬 스토리지에 저장
+                if (data.accessToken && data.refreshToken) {
+                    localStorage.setItem('token', data.accessToken);  // 액세스 토큰 저장
+                    localStorage.setItem('refreshToken', data.refreshToken);  // 리프레시 토큰 저장
+                    window.location.href = data.redirecturl;  // 리다이렉트 URL로 이동
+                } else {
+                    console.error('토큰을 받지 못했습니다:', data);
+                    alert('로그인에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('로그인 처리 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 카카오 로그인 버튼 생성 및 처리
+        Kakao.Auth.createLoginButton({
+            container: '#kakao-login-btn', // 로그인 버튼이 생성될 컨테이너 지정
+            success: handleLoginSuccess,
+            fail: function (err) {
+                console.error('로그인 실패:', err);
+                alert('로그인에 실패했습니다.');
+            }
+        });
+    </script>
+</body>
+
+</html>

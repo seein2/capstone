@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 글 작성</title>
+</head>
+
+<body>
+    <h1>커뮤니티 글 작성</h1>
+    <form id="create-post-form">
+        <label for="title">제목:</label>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required></textarea><br><br>
+
+        <button type="submit">작성</button>
+
+        <!-- 다시 커뮤니티 게시판으로 -->
+        <button type="button" onclick="window.location.href='/community.html';">게시판</button>
+
+    </form>
+
+    <script>
+        document.getElementById('create-post-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            // 사용자 정보를 가져오는 요청
+            fetch('/profile/user-info')
+                .then(response => {
+                    if (!response.ok) throw new Error('사용자 정보를 가져오는 중 오류가 발생했습니다.');
+                    return response.json();
+                })
+                .then(data => {
+                    const userId = data.userId;
+
+                    // 게시물 작성 요청
+                    fetch('/community/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ title, content, userId }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error);
+                            } else {
+                                alert('게시물 작성 완료');
+                                window.location.href = '/community.html';  // 작성 완료 후 커뮤니티 목록 페이지로 이동
+                            }
+                        })
+                        .catch(error => {
+                            console.error('게시물 작성 중 오류:', error);
+                            alert('게시물 작성 중 오류가 발생했습니다.');
+                        });
+                })
+                .catch(error => {
+                    console.error('사용자 정보 요청 오류:', error);
+                    alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+                });
+        });
+    </script>
+</body>
+
+</html>
