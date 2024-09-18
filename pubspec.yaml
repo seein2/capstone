@@ -1,0 +1,39 @@
+name: flutter_calendar_app
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  table_calendar: ^3.0.6  # Ensure to use the latest version available
+  fluttertoast: ^8.2.8
+  provider: ^6.1.2
+  kakao_flutter_sdk_user: ^1.9.6
+  kakao_flutter_sdk: ^1.9.6
+  kakao_flutter_sdk_share: ^1.9.6
+  kakao_flutter_sdk_talk: ^1.9.6
+  kakao_flutter_sdk_auth: ^1.9.6
+  kakao_flutter_sdk_common: ^1.9.6
+  kakao_flutter_sdk_template: ^1.9.6
+  http: ^0.13.5
+  intl: ^0.19.0
+  shared_preferences: ^2.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: YClover
+      fonts:
+        - asset: assets/fonts/YClover TTF-Bold.ttf
