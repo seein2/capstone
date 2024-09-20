@@ -1,4 +1,3 @@
-// controllers/diaryController.js
 const axios = require('axios');
 const Diary = require('../models/diary');
 const Chatbot = require('../models/chatbot');
@@ -23,8 +22,16 @@ const diaryController = async (req, res) => {
 
       try {
         // Python 서버로 감정 분석 요청
-        const pythonResponse = await axios.post('http://192.168.35.33:5001/predict', { diaryText });
-        const { sadness, anxiety, anger, happiness, confusion } = pythonResponse.data;
+        const pythonResponse = await axios.post('http://54.180.56.71:5001/predict', { diaryText });
+        let analysisResult = pythonResponse.data;
+
+        // 감정 5가지를 모두 포함시키기 위해 누락된 감정에 기본값(0)을 할당
+        const { sadness = 0, anxiety = 0, anger = 0, happiness = 0, confusion = 0 } = analysisResult;
+
+        // 0이 아닌 감정만 필터링하여 클라이언트에 전달할 데이터 생성
+        const filteredAnalysisResult = Object.fromEntries(
+          Object.entries(analysisResult).filter(([emotion, value]) => value > 0)
+        );
 
         // 일기 및 분석 결과 저장
         const diaryId = await Diary.saveDiary(userId, communityNickname, diaryText, sadness, anxiety, anger, happiness, confusion);
@@ -33,10 +40,10 @@ const diaryController = async (req, res) => {
         const chatbotResponse = await Chatbot.generateResponse(diaryText, { sadness, anxiety, anger, happiness, confusion });
         await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
 
-        // 클라이언트로 응답 전송
+        // 클라이언트로 응답 전송 (0이 아닌 감정 결과만 전송)
         res.json({
           success: true,
-          analysisResult: { sadness, anxiety, anger, happiness, confusion },
+          analysisResult: filteredAnalysisResult,
           chatbotResponse,
         });
       } catch (error) {
