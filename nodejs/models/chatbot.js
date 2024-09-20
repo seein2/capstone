@@ -3,7 +3,7 @@ const db = require('../config/db');
 
 // OpenAI API 키 설정
 const openai = new OpenAI({
-    apiKey: process.env.GPT_API_KEY // 환경 변수에서 API 키를 불러옴
+    apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
   });
 
 const Chatbot = {
