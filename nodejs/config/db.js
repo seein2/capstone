@@ -21,4 +21,3 @@ db.connect((err) => {
 });
 
 module.exports = db;  // 연결된 db 객체를 모듈로 내보내기
-
