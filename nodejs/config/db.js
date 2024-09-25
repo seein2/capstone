@@ -44,7 +44,8 @@ function ensureTablesExist() {
       content TEXT NOT NULL,
       userId BIGINT NOT NULL,
       likes INT DEFAULT 0,
-      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT FK_User_Post FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 
@@ -53,7 +54,9 @@ function ensureTablesExist() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       postId INT NOT NULL,
       userId BIGINT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT FK_Post_Like FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+      CONSTRAINT FK_User_Post_Like FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 
@@ -64,7 +67,9 @@ function ensureTablesExist() {
       postId INT NOT NULL,
       userId BIGINT NOT NULL,
       likes INT DEFAULT 0,
-      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT FK_Post_Comment FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+      CONSTRAINT FK_User_Comment FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 
@@ -73,7 +78,9 @@ function ensureTablesExist() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       commentId INT NOT NULL,
       userId BIGINT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT FK_Comment_Like FOREIGN KEY (commentId) REFERENCES comments(id) ON DELETE CASCADE,
+      CONSTRAINT FK_User_Comment_Like FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 
@@ -88,7 +95,8 @@ function ensureTablesExist() {
       anxiety DECIMAL(5,2),
       anger DECIMAL(5,2),
       happiness DECIMAL(5,2),
-      confusion DECIMAL(5,2)
+      confusion DECIMAL(5,2),
+      CONSTRAINT FK_User_Diary FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 
@@ -99,7 +107,9 @@ function ensureTablesExist() {
       userId BIGINT NOT NULL,
       community_nickname VARCHAR(100),
       response_text TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT FK_Diary_Chatbot FOREIGN KEY (diary_id) REFERENCES diaries(id) ON DELETE CASCADE,
+      CONSTRAINT FK_User_Chatbot FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 

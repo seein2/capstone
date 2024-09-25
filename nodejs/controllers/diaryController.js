@@ -22,7 +22,7 @@ exports.diaryController = async (req, res) => {
 
       try {
         // Python 서버로 감정 분석 요청
-        const pythonResponse = await axios.post('http://10.100.1.70:5001/predict', { diaryText });
+        const pythonResponse = await axios.post('http://3.37.75.25:5001/predict', { diaryText });
         const analysisResult = pythonResponse.data;
 
         // 감정 결과가 있을 때만 할당
