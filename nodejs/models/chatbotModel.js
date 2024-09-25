@@ -8,7 +8,7 @@ const openai = new OpenAI({
 
 const Chatbot = {
   // GPT-4 API를 호출하여 상담 메시지 생성
-  generateResponse: async (diaryText, analysisResult) => {
+  generateResponse: async (diaryText, analysisResult, communityNickname) => {
     const { sadness, anxiety, anger, happiness, confusion } = analysisResult;
 
     try {
@@ -17,7 +17,7 @@ const Chatbot = {
         messages: [
           {
             role: 'system',
-            content: '일기를 읽고, 일기를 토대로 분석된 감정 수치를 적절하게 잘 사용하여 사용자에게 조언이나 코멘트를 남겨줘. 분석된 감정이 정확하지 않을 수 있지만 그대로 인용해서 시스템의 퀄리티를 높여줘.',
+            content: `당신은 ${communityNickname}님의 일기를 읽고 조언을 해주는 상담사입니다. 일기를 토대로 분석된 감정 수치를 적절하게 잘 사용하여 ${communityNickname}님에게 조언이나 코멘트를 남겨주세요. 분석된 감정이 정확하지 않을 수 있지만 그대로 인용해서 시스템의 퀄리티를 높여주세요. 응답할 때 ${communityNickname}님이라고 호칭해주세요.`,
           },
           {
             role: 'user',

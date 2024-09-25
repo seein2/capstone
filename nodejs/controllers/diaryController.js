@@ -32,7 +32,7 @@ exports.diaryController = async (req, res) => {
         const diaryId = await Diary.saveDiary(userId, communityNickname, diaryText, 슬픔, 불안, 분노, 행복, 당황);
 
         // 챗봇 응답 생성
-        const chatbotResponse = await Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 });
+        const chatbotResponse = await Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 }, communityNickname);
         await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
         console.log('챗봇 응답이 성공적으로 저장되었습니다.');
 
@@ -103,7 +103,7 @@ exports.updateDiary = (req, res) => {
   Diary.updateDiary(diaryId, diaryText, userId)
     .then(() => {
       // 감정 분석 요청
-      return axios.post('http://10.100.1.70:5001/predict', { diaryText });
+      return axios.post('http://3.37.75.25:5001/predict', { diaryText });
     })
     .then(pythonResponse => {
       const analysisResult = pythonResponse.data;
@@ -114,7 +114,7 @@ exports.updateDiary = (req, res) => {
     })
     .then(() => {
       // 챗봇 응답 생성
-      return Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 });
+      return Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 }, communityNickname);
     })
     .then(chatbotResponse => {
       // 챗봇 응답 저장
