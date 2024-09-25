@@ -13,8 +13,8 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-admin-key.json');
 require('dotenv').config();
 
+// 웹 관련 (세션임)
 const MySQLStore = require('express-mysql-session')(session);
-
 const sessionStore = new MySQLStore({
     host: process.env.DATABASE_HOST,
     port: 3306,
@@ -22,6 +22,8 @@ const sessionStore = new MySQLStore({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME
 });
+
+// ------------------------------------------------------
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -32,19 +34,10 @@ app.use(cors({
     origin: '*',  // 모든 출처에서의 요청 허용
     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // 허용할 메소드 지정
     credentials: true  // 자격 증명(쿠키, 인증 헤더 등)을 포함한 요청 허용
-  }));
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// 세션 설정
-app.use(session({
-    secret: process.env.SECRET_KEY || 'default-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
 
 // Passport 설정
 app.use(passport.initialize());
@@ -66,6 +59,15 @@ app.use('/diary', diaryRouter); // 다이어리 관련 라우트
 app.get('/settings', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'settings.html'));
 });
+
+// 세션 설정
+app.use(session({
+    secret: process.env.SECRET_KEY || 'default-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
 
 // 홈 경로
 app.get('/', (req, res) => {
