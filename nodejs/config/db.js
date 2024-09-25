@@ -44,7 +44,7 @@ function ensureTablesExist() {
       content TEXT NOT NULL,
       userId BIGINT NOT NULL,
       likes INT DEFAULT 0,
-      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       CONSTRAINT FK_User_Post FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
