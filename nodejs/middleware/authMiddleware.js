@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
 
+/*
 // 사용자가 로그인이 안 돼 있을 시 연결을 위한 미들웨어
 module.exports = {
   ensureAuthenticated: function (req, res, next) {
@@ -41,35 +42,33 @@ exports.authenticateToken = (req, res, next) => {
     next();
   });
 };
+*/
 
-/*
-module.exports = {
-  ensureAuthenticated: function (req, res, next) {
-    // JWT 검증을 사용할 경우 세션 인증은 필요 없음
-    const isAppRequest = req.headers['authorization']; // Authorization 헤더가 있는지 확인하여 앱 요청 구분
+// ensureAuthenticated 함수 정의
+function ensureAuthenticated(req, res, next) {
+  const isAppRequest = req.headers['authorization'];
 
-    if (isAppRequest) {
-      // 세션 인증을 건너뛰고, 다음 미들웨어로 바로 진행 (JWT 검증을 할 것이므로)
-      return next();
-    }
-
-    if (req.isAuthenticated()) {
-      return next();  // 세션 기반 인증 (웹에서만 사용)
-    } else {
-      if (res.headersSent) {
-        return;  // 이미 응답이 전송되었다면 함수를 중단
-      }
-
-      if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
-        return res.status(401).json({ error: '로그인이 필요합니다.' });
-      }
-
-      return res.redirect('/kakao_login.html');  // 웹 브라우저에서 로그인 페이지로 리다이렉트
-    }
+  if (isAppRequest) {
+    return next();
   }
-};
 
-exports.authenticateToken = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    if (res.headersSent) {
+      return;
+    }
+
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.status(401).json({ error: '로그인이 필요합니다.' });
+    }
+
+    return res.redirect('/kakao_login.html');
+  }
+}
+
+// authenticateToken 함수 정의
+function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -79,17 +78,23 @@ exports.authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.log("JWT 검증 오류:", err);  // JWT 오류 로그 추가
       return res.status(403).json({ error: 'Access Token이 유효하지 않습니다.' });
     }
 
     req.user = user;
     next();
   });
+}
+
+// 함수들을 내보내기
+module.exports = {
+  ensureAuthenticated,
+  authenticateToken,
 };
 
 
 
+/*
 앱에서 해줘야 할 일
 1. 로그인 후 JWT 토큰 저장
 로그인 성공 후 **JWT 토큰(accessToken)**을 받아서 앱의 로컬 스토리지 또는 SharedPreferences에 저장해야 합니다.
@@ -161,5 +166,4 @@ class ApiService {
       throw Exception('게시물 가져오기 실패');
     }
   }
-
-*/
+    */

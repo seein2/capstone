@@ -41,22 +41,28 @@ exports.getProfileSetup = (req, res) => {
 
 // 프로필 설정 처리
 exports.setupProfile = (req, res) => {
-    const { nickname, icon } = req.body;
-    const userId = req.user.id;
-
+    const { userId, nickname, icon } = req.body;  // userId를 요청 본문에서 받음
+  
+    if (!userId) {
+        console.log("no id");
+      return res.status(400).json({ error: 'userId is required' });
+    }
+  
     const sql = 'UPDATE users SET community_nickname = ?, community_icon = ?, is_profile_complete = true WHERE id = ?';
     db.query(sql, [nickname, icon, userId], (err, result) => {
-        if (err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({ error: '이미 사용 중인 커뮤니티 닉네임입니다.' });
-            }
-            console.error('프로필 설정 중 오류:', err);
-            return res.status(500).json({ error: '프로필 설정 중 오류가 발생했습니다.' });
+      if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(400).json({ error: '이미 사용 중인 커뮤니티 닉네임입니다.' });
         }
-
-        res.json({ success: true });
+        console.error('프로필 설정 중 오류:', err);
+        console.log('프로필 설정 중 오류:');
+        return res.status(500).json({ error: '프로필 설정 중 오류가 발생했습니다.' });
+      }
+  
+      res.json({ success: true });
     });
-};
+  };
+  
 
 // 프로필 수정 처리
 exports.editProfile = (req, res) => {

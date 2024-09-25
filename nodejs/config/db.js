@@ -1,4 +1,4 @@
-// MySQL을 기반으로 하여 데이터베이스 연결 설정
+// MySQL을 기반으로 한 데이터베이스 연결을 하기로 함.
 
 const mysql = require('mysql2');
 require('dotenv').config();  // 환경 변수 불러오기

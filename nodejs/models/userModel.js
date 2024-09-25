@@ -53,28 +53,6 @@ const User = {
             });
         });
     },
-
-    // Refresh Token 저장 함수
-    saveRefreshToken: (userId, refreshToken) => {
-        return new Promise((resolve, reject) => {
-            const sql = 'UPDATE users SET refreshToken = ? WHERE id = ?';
-            db.query(sql, [refreshToken, userId], (err, result) => {
-                if (err) return reject(err);
-                resolve(result);
-            });
-        });
-    },
-
-    // Refresh Token 삭제 함수
-    deleteRefreshToken: (userId) => {
-        return new Promise((resolve, reject) => {
-            const sql = 'UPDATE users SET refreshToken = NULL WHERE id = ?';
-            db.query(sql, [userId], (err, result) => {
-                if (err) return reject(err);
-                resolve(result);
-            });
-        });
-    }
 };
 
 // FCM 토큰 업데이트 함수

@@ -4,10 +4,15 @@ const db = require('../config/db');
 // 게시물 작성
 exports.createPost = (req, res) => {
   const { title, content } = req.body;
-  const userId = req.user.id;
+  const userId = req.user ? req.user.id : null;
 
   if (!title || !content) {
     return res.status(400).json({ error: '제목과 내용을 입력해야 합니다.' });
+  }
+
+  // userId가 없는 경우 에러 처리
+  if (!userId) {
+    return res.status(400).json({ error: '로그인된 사용자만 게시물을 작성할 수 있습니다.' });
   }
 
   Post.create({ title, content, userId })

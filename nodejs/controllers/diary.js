@@ -3,7 +3,7 @@ const Diary = require('../models/diary');
 const Chatbot = require('../models/chatbot');
 const db = require('../config/db');
 
-const diaryController = async (req, res) => {
+exports.diaryController = async (req, res) => {
   try {
     const { userId, diaryText } = req.body;
 
@@ -59,4 +59,96 @@ const diaryController = async (req, res) => {
   }
 };
 
-module.exports = { diaryController };
+// 특정 날짜의 일기 목록 조회
+exports.getDiaryByDate = async (req, res) => {
+  const { userId } = req.params;
+  const { date } = req.query;  // yyyy-mm-dd 형식의 날짜를 query로 받아옴
+
+  try {
+    const diaries = await Diary.getDiaryByDate(userId, date);
+
+    if (diaries.length === 0) {
+      return res.status(404).json({ success: false, message: '해당 날짜에 작성된 일기가 없습니다.' });
+    }
+
+    res.json({
+      success: true,
+      diaries: diaries
+    });
+  } catch (error) {
+    console.error('일기 조회 중 오류:', error);
+    res.status(500).json({ success: false, message: '일기 조회 중 오류가 발생했습니다.' });
+  }
+};
+
+// 전체 일기 목록 조회
+exports.getAllDiaries = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const diaries = await Diary.getAllDiaries(userId);
+
+    res.json({ success: true, diaries });
+  } catch (error) {
+    console.error('전체 일기 목록 조회 오류:', error);
+    res.status(500).json({ success: false, message: '전체 일기 목록 조회 중 오류 발생' });
+  }
+};
+
+// 일기 수정 및 감정 분석/챗봇 응답 갱신
+exports.updateDiary = (req, res) => {
+  const { diaryId, diaryText } = req.body;
+  const userId = req.user.id;
+
+  // 일기 텍스트 수정
+  Diary.updateDiary(diaryId, diaryText, userId)
+    .then(() => {
+      // 감정 분석 요청
+      return axios.post('http://10.100.1.70:5001/predict', { diaryText });
+    })
+    .then(pythonResponse => {
+      const analysisResult = pythonResponse.data;
+      const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
+
+      // 감정 분석 결과 저장
+      return Diary.updateEmotionResults(diaryId, { 슬픔, 불안, 분노, 행복, 당황 });
+    })
+    .then(() => {
+      // 챗봇 응답 생성
+      return Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 });
+    })
+    .then(chatbotResponse => {
+      // 챗봇 응답 저장
+      return Chatbot.updateChatbotResponse(diaryId, chatbotResponse);
+    })
+    .then(() => {
+      res.json({ message: '일기 및 감정 분석, 챗봇 응답 수정 성공' });
+    })
+    .catch(err => {
+      console.error('일기 수정 중 오류:', err);
+      res.status(500).json({ error: '일기 수정 중 오류가 발생했습니다.' });
+    });
+};
+
+// 일기 삭제
+exports.deleteDiary = (req, res) => {
+  const { diaryId } = req.params;
+  const userId = req.user.id;
+
+  // 일기 삭제
+  Diary.deleteDiary(diaryId, userId)
+    .then(() => {
+      // 감정 분석 결과 삭제
+      return Diary.deleteEmotionResults(diaryId);
+    })
+    .then(() => {
+      // 챗봇 응답 삭제
+      return Chatbot.deleteChatbotResponse(diaryId);
+    })
+    .then(() => {
+      res.json({ message: '일기 및 관련 데이터 삭제 성공' });
+    })
+    .catch(err => {
+      console.error('일기 삭제 중 오류:', err);
+      res.status(500).json({ error: '일기 삭제 중 오류가 발생했습니다.' });
+    });
+};
