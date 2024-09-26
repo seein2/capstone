@@ -3,15 +3,16 @@ const session = require('express-session');
 const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
+const admin = require('firebase-admin');
+require('dotenv').config();
+
 const passport = require('./passport/passport');
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const diaryRouter = require('./routes/diary');
 const profileRoutes = require('./routes/profileRoutes');
-const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-admin-key.json');
-require('dotenv').config();
 
 // 웹 관련 (세션임)
 const MySQLStore = require('express-mysql-session')(session);
@@ -29,7 +30,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // 미들웨어 설정
-app.use(morgan('dev'));
+app.use(morgan('combined', {
+    skip: function (req, res) { return res.statusCode < 400 }
+    }));
+
 app.use(cors({
     origin: '*',  // 모든 출처에서의 요청 허용
     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // 허용할 메소드 지정

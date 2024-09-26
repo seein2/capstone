@@ -31,7 +31,7 @@ const User = {
                     ON DUPLICATE KEY UPDATE
                     nickname = VALUES(nickname),
                     profile_image = VALUES(profile_image),
-                    email = VALUES(email),
+                    email = IF(VALUES(email) IS NOT NULL, VALUES(email), email),
                     community_nickname = VALUES(community_nickname),
                     community_icon = VALUES(community_icon),
                     is_profile_complete = VALUES(is_profile_complete);
