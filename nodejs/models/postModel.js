@@ -5,7 +5,7 @@ const Post = {
   getAllWithPaging: ({ limit, offset }) => {
     return new Promise((resolve, reject) => {
       const sql = `
-        SELECT posts.*, users.community_nickname AS nickname,
+        SELECT posts.*, users.community_nickname,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount,
             (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount
         FROM posts

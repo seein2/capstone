@@ -5,7 +5,7 @@ const Comment = {
   getAllByPostId: (postId) => {
     return new Promise((resolve, reject) => {
       const sql = `
-        SELECT comments.*, users.community_nickname AS nickname,
+        SELECT comments.*, users.community_nickname,
           (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id) AS likeCount
         FROM comments
         JOIN users ON comments.userId = users.id

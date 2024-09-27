@@ -9,7 +9,7 @@ exports.getCommentsByPostId = (req, res) => {
 
   const sql = `
         SELECT comments.*, 
-               users.community_nickname AS nickname,
+               users.community_nickname,
                (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id) AS likeCount
         FROM comments
         JOIN users ON comments.userId = users.id  -- 댓글 작성자 정보 포함

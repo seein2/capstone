@@ -129,8 +129,9 @@ exports.getMyPosts = (req, res) => {
   const userId = req.user.id;
 
   const sql = `
-        SELECT posts.*,
-               (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
+        SELECT posts.*, 
+            users.community_nickname,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
         FROM posts
         WHERE posts.userId = ?
         ORDER BY posts.created_at DESC
@@ -154,7 +155,8 @@ exports.searchPosts = (req, res) => {
   }
 
   const sql = `
-        SELECT * FROM posts 
+        SELECT *, users.community_nickname
+        FROM posts 
         WHERE title LIKE ? OR content LIKE ?
         ORDER BY created_at DESC
     `;
