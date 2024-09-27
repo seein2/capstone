@@ -26,7 +26,7 @@ exports.diaryController = async (req, res) => {
         const analysisResult = pythonResponse.data;
 
         // 감정 결과가 있을 때만 할당
-        // const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
+        const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
 
         // 일기 및 분석 결과 저장 (한글 감정 그대로 저장)
         const diaryId = await Diary.saveDiary(userId, communityNickname, diaryText, 슬픔, 불안, 분노, 행복, 당황);

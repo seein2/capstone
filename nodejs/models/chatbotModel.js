@@ -9,7 +9,7 @@ const openai = new OpenAI({
 const Chatbot = {
   // GPT-4 API를 호출하여 상담 메시지 생성
   generateResponse: async (diaryText, analysisResult, communityNickname) => {
-    const { sadness, anxiety, anger, happiness, confusion } = analysisResult;
+    const { 슬픔, 불안, 분노, 행복, 당황 } = analysisResult;
 
     try {
       const response = await openai.chat.completions.create({
@@ -21,7 +21,7 @@ const Chatbot = {
           },
           {
             role: 'user',
-            content: `일기: ${diaryText}, 감정 분석 결과: 슬픔: ${sadness}%, 불안: ${anxiety}%, 분노: ${anger}%, 행복: ${happiness}%, 당황: ${confusion}%`,
+            content: `일기: ${diaryText}, 감정 분석 결과: 슬픔: ${슬픔}%, 불안: ${불안}%, 분노: ${분노}%, 행복: ${행복}%, 당황: ${당황}%`,
           },
         ],
       });
