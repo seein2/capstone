@@ -133,6 +133,7 @@ exports.getMyPosts = (req, res) => {
             users.community_nickname,
             (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
         FROM posts
+        JOIN users ON posts.userId = users.id
         WHERE posts.userId = ?
         ORDER BY posts.created_at DESC
     `;
