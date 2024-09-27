@@ -26,13 +26,13 @@ exports.diaryController = async (req, res) => {
         const analysisResult = pythonResponse.data;
 
         // 감정 결과가 있을 때만 할당
-        const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
+        // const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
 
         // 일기 및 분석 결과 저장 (한글 감정 그대로 저장)
         const diaryId = await Diary.saveDiary(userId, communityNickname, diaryText, 슬픔, 불안, 분노, 행복, 당황);
 
         // 챗봇 응답 생성
-        const chatbotResponse = await Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 }, communityNickname);
+        const chatbotResponse = await Chatbot.generateResponse(diaryText, analysisResult, communityNickname);
         await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
         console.log('챗봇 응답이 성공적으로 저장되었습니다.');
 
@@ -107,14 +107,14 @@ exports.updateDiary = (req, res) => {
     })
     .then(pythonResponse => {
       const analysisResult = pythonResponse.data;
-      const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
+      // const { 슬픔 = 0, 불안 = 0, 분노 = 0, 행복 = 0, 당황 = 0 } = analysisResult;
 
       // 감정 분석 결과 저장
-      return Diary.updateEmotionResults(diaryId, { 슬픔, 불안, 분노, 행복, 당황 });
+      return Diary.updateEmotionResults(diaryId, analysisResult);
     })
     .then(() => {
       // 챗봇 응답 생성
-      return Chatbot.generateResponse(diaryText, { 슬픔, 불안, 분노, 행복, 당황 }, communityNickname);
+      return Chatbot.generateResponse(diaryText, analysisResult, communityNickname);
     })
     .then(chatbotResponse => {
       // 챗봇 응답 저장

@@ -14,7 +14,7 @@ exports.getCommentsByPostId = (req, res) => {
         FROM comments
         JOIN users ON comments.userId = users.id  -- 댓글 작성자 정보 포함
         WHERE comments.postId = ?
-        ORDER BY comments.createdAt DESC;
+        ORDER BY comments.createdAt ASC;
     `;
 
   db.query(sql, [postId], (err, results) => {

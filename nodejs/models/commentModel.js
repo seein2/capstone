@@ -10,7 +10,7 @@ const Comment = {
         FROM comments
         JOIN users ON comments.userId = users.id
         WHERE comments.postId = ?
-        ORDER BY comments.createdAt DESC
+        ORDER BY comments.createdAt ASC
       `;
       db.query(sql, [postId], (err, results) => {
         if (err) return reject(err);
