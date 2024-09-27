@@ -157,7 +157,7 @@ exports.searchPosts = (req, res) => {
   const sql = `
         SELECT *, users.community_nickname
         FROM posts
-        JOIN users ON comments.userId = users.id
+        JOIN users ON posts.userId = users.id
         WHERE title LIKE ? OR content LIKE ?
         ORDER BY created_at DESC
     `;
