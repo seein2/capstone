@@ -26,15 +26,6 @@ const sessionStore = new MySQLStore({
 
 // ------------------------------------------------------
 
-// 세션 설정
-app.use(session({
-    secret: process.env.SECRET_KEY || 'default-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
-
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -60,6 +51,15 @@ app.use(passport.session());
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
+
+// 세션 설정
+app.use(session({
+    secret: process.env.SECRET_KEY || 'default-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
 
 // 라우트 설정
 app.use('/auth', authRoutes); // 인증 관련 라우트
