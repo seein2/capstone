@@ -129,11 +129,11 @@ exports.getMyPosts = (req, res) => {
   const userId = req.user.id;
 
   const sql = `
-        SELECT posts.*, 
+        SELECT posts.*,
                (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
         FROM posts
         WHERE posts.userId = ?
-        ORDER BY posts.createdAt DESC
+        ORDER BY posts.created_at DESC
     `;
 
   db.query(sql, [userId], (err, results) => {
@@ -149,14 +149,14 @@ exports.getMyPosts = (req, res) => {
 exports.searchPosts = (req, res) => {
   const keyword = req.query.keyword;
 
-  if (!keyword) {
-    return res.status(400).json({ error: '검색어를 입력해주세요.' });
+  if (!keyword || keyword.trim().length === 0) {
+    return res.status(400).json({ error: '유효한 검색어를 입력해주세요.' });
   }
 
   const sql = `
         SELECT * FROM posts 
         WHERE title LIKE ? OR content LIKE ?
-        ORDER BY createdAt DESC
+        ORDER BY created_at DESC
     `;
   const searchKeyword = `%${keyword}%`;
 

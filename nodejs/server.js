@@ -26,13 +26,22 @@ const sessionStore = new MySQLStore({
 
 // ------------------------------------------------------
 
+// 세션 설정
+app.use(session({
+    secret: process.env.SECRET_KEY || 'default-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 // 미들웨어 설정
 app.use(morgan('combined', {
     skip: function (req, res) { return res.statusCode < 400 }
-    }));
+    })); // 로그 표시 ( 400이하 상태코드만 표시)
 
 app.use(cors({
     origin: '*',  // 모든 출처에서의 요청 허용
@@ -63,16 +72,6 @@ app.use('/diary', diaryRouter); // 다이어리 관련 라우트
 app.get('/settings', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'settings.html'));
 });
-
-// 세션 설정
-app.use(session({
-    secret: process.env.SECRET_KEY || 'default-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
-
 // 홈 경로
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'main.html'));

@@ -4,7 +4,7 @@ const db = require('../config/db');
 exports.getProfile = (req, res) => {
     const userId = req.user.id;
 
-    const sql = 'SELECT community_nickname, community_icon FROM users WHERE id = ?';
+    const sql = 'SELECT community_nickname, community_icon, email FROM users WHERE id = ?';
     db.query(sql, [userId], (err, results) => {
         if (err) {
             console.error('프로필 정보를 가져오는 중 오류:', err);
