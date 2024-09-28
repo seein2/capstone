@@ -21,7 +21,12 @@ const Diary = {
   // 특정 날짜에 작성된 일기 목록 조회 메서드
   getDiaryByDate: (userId, selectedDate) => {
     return new Promise((resolve, reject) => {
-      const sql = 'SELECT * FROM diaries WHERE userId = ? AND DATE(analyzed_at) = ?';
+      const sql = `
+  SELECT diaries.*, chatbot_responses.response_text 
+  FROM diaries 
+  LEFT JOIN chatbot_responses ON diaries.id = chatbot_responses.diary_id 
+  WHERE diaries.userId = ? AND DATE(diaries.analyzed_at) = ?
+`;
       db.query(sql, [userId, selectedDate], (err, result) => {
         if (err) {
           reject(err);
@@ -60,6 +65,27 @@ const Diary = {
     return new Promise((resolve, reject) => {
       const sql = 'DELETE FROM diaries WHERE id = ? AND userId = ?';
       db.query(sql, [diaryId, userId], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  },
+
+  updateEmotionResults: (diaryId, analysisResult) => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        UPDATE diaries SET 
+          sadness = ?, anxiety = ?, anger = ?, happiness = ?, confusion = ?
+        WHERE id = ?
+      `;
+      db.query(sql, [
+        analysisResult.슬픔,
+        analysisResult.불안,
+        analysisResult.분노,
+        analysisResult.행복,
+        analysisResult.당황,
+        diaryId
+      ], (err, result) => {
         if (err) return reject(err);
         resolve(result);
       });

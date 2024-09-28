@@ -52,7 +52,22 @@ const Chatbot = {
         resolve();
       });
     });
-  }
+  },
+
+  // 챗봇 응답 수정
+  updateChatbotResponse: (diaryId, responseText) => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        UPDATE chatbot_responses SET response_text = ? WHERE diary_id = ?
+      `;
+      db.query(sql, [responseText, diaryId], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
 };
 
 module.exports = Chatbot;
