@@ -3,15 +3,18 @@ const db = require('../config/db');
 
 // OpenAI API 키 설정
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
-  });
+  apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
+});
 
 const Chatbot = {
   // GPT-4 API를 호출하여 상담 메시지 생성
-  generateResponse: async (diaryText, analysisResult, communityNickname) => {
-    const { 슬픔, 불안, 분노, 행복, 당황 } = analysisResult;
-
+  generateResponse: async (diaryText, emotions, communityNickname) => {
     try {
+      // 분석결과 문자열로
+      const emotionString = Object.entries(emotions)
+        .map(([emotion, value]) => `${emotion}: ${value}%`)
+        .join(', ');
+
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
@@ -26,7 +29,7 @@ const Chatbot = {
           },
           {
             role: 'user',
-            content: `일기: ${diaryText}, 감정 분석 결과: 슬픔: ${슬픔}%, 불안: ${불안}%, 분노: ${분노}%, 행복: ${행복}%, 당황: ${당황}%`,
+            content: `일기: ${diaryText}, \n감정 분석 결과:  ${emotionString}`,
           },
         ],
       });
