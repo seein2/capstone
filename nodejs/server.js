@@ -30,9 +30,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // 미들웨어 설정
-app.use(morgan('combined', {
+app.use(morgan('dev', {
     skip: function (req, res) { return res.statusCode < 400 }
-    })); // 로그 표시 ( 400이상 상태코드만 표시)
+    })); // 로그 표시 ( 400이상 상태코드만 표시) <배포시 combined>
 
 app.use(cors({
     origin: '*',  // 모든 출처에서의 요청 허용

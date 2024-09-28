@@ -35,7 +35,7 @@ class Post {
     });
   }
 
-  // 게시물 ID로 게시물 찾기
+  // 게시물 ID로 게시물 찾기 (이것도 필요한가?)
   static findById(postId) {
     return new Promise((resolve, reject) => {
       const sql = 'SELECT * FROM posts WHERE id = ?';
