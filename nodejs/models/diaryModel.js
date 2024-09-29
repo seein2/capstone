@@ -35,22 +35,15 @@ class Diary {
     } catch (error) {
       console.error('일기 처리 중 오류 발생:', error);
 
-      // 특정 에러에 대한 커스텀 에러 객체 생성
       if (error.message === '커뮤니티 닉네임을 찾을 수 없습니다.') {
-        throw {
-          status: 404,
-          message: error.message
-        };
+        throw new Error('커뮤니티 닉네임을 찾을 수 없습니다.');
       }
 
       // 기타 에러는 일반적인 서버 에러로 처리
-      throw {
-        status: 500,
-        message: '일기 처리 중 오류가 발생했습니다.',
-        error: error.message
-      };
+      throw new Error('일기 처리 중 오류가 발생했습니다.');
     }
   }
+
   static async getCommunityNickname(userId) {
     return new Promise((resolve, reject) => {
       const sql = 'SELECT community_nickname FROM users WHERE id = ?';
