@@ -6,10 +6,11 @@ const { sendPushNotification } = require('../services/notificationService');
 exports.getCommentsByPostId = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const result = await Comment.getAllByPostId(postId);
+    const userId = req.user.id;  // 현재 사용자 ID
+    const result = await Comment.getAllByPostId(postId, userId);  // userId 전달
     res.json(result);
   } catch (err) {
-    console.error('댓글 조회 오류: ', error);
+    console.error('댓글 조회 오류: ', err);
     res.status(500).json({ error: '댓글 조회 중 오류 발생' });
   }
 };

@@ -6,6 +6,7 @@ class Comment {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT comments.*, users.community_nickname,
+          (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id AND userId = ?) AS isLiked,
           (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id) AS likeCount
         FROM comments
         JOIN users ON comments.userId = users.id
@@ -14,7 +15,10 @@ class Comment {
       `;
       db.query(sql, [postId], (err, results) => {
         if (err) return reject(err);
-        resolve(results);  // 댓글과 함께 likeCount를 반환
+        resolve(results.map(comment => ({
+          ...comment,
+          isLiked: comment.isLiked > 0  // 좋아요 여부를 boolean으로 반환
+        })));
       });
     });
   }
@@ -26,7 +30,7 @@ class Comment {
       const sql = 'SELECT * FROM comments WHERE id = ?';
       db.query(sql, [commentId], (err, results) => {
         if (err) return reject(err);
-        resolve(results.length>0 ? results[0] : null);
+        resolve(results.length > 0 ? results[0] : null);
       });
     });
   }

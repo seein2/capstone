@@ -15,7 +15,7 @@ class Post {
         ORDER BY posts.created_at DESC
         LIMIT ? OFFSET ?;
       `;
-      db.query(sql, [limit, offset], (err, results) => {
+      db.query(sql, [userId, limit, offset], (err, results) => {
         if (err) return reject(err);
 
         const countSql = 'SELECT COUNT(*) AS totalPosts FROM posts';

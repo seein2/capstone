@@ -50,7 +50,7 @@ exports.updateDiary = async (req, res) => {
     const userId = req.user.id;
     const result = await Diary.updateDiaryAndAnalyze(diaryId, diaryText, userId);
     res.json(result);
-  } catch (err) {
+  } catch (error) {
     console.error('일기 수정 중 오류:', error);
     res.status(500).json({ error: '일기 수정 중 오류가 발생했습니다.' });
   }
