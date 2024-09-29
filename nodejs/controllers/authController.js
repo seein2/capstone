@@ -111,13 +111,7 @@ exports.deleteAccount = (req, res) => {
       return res.status(400).json({ message: '사용자를 찾을 수 없습니다.' });
     }
 
-    req.logout(function (err) {
-      if (err) {
-        console.error('로그아웃 중 오류:', err);
-        return res.status(500).json({ error: '로그아웃 중 오류가 발생했습니다.' });
-      }
-
-      res.json({ message: '회원탈퇴 및 세션 삭제가 완료되었습니다.' });
-    });
+    // 세션을 사용하지 않는다면 로그아웃 처리 부분 제거
+    res.json({ message: '회원탈퇴 및 데이터 삭제가 완료되었습니다.' });
   });
 };
