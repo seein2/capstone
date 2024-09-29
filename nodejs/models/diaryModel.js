@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const Chatbot = require('./chatbotModel');
+const axios = require('axios');
 
 class Diary {
   static async processAndSaveDiary(userId, diaryText) {
@@ -34,7 +35,7 @@ class Diary {
       };
     } catch (error) {
       console.error('일기 처리 중 오류 발생:', error);
-      
+
       if (error.message === '커뮤니티 닉네임을 찾을 수 없습니다.') {
         throw new Error('커뮤니티 닉네임을 찾을 수 없습니다.');
       }
