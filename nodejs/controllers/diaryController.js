@@ -18,9 +18,12 @@ exports.diaryController = async (req, res) => {
 // 특정 날짜의 일기 목록 조회
 exports.getDiaryByDate = async (req, res) => {
   try {
-    const userId = parseInt(req.params.userId, 10);
+    const {userId} = req.params;
     const { date } = req.query;  // yyyy-mm-dd 형식의 날짜를 query로 받아옴
     const result = await Diary.getDiaryByDate(userId, date);
+    if (diaries.length === 0) {
+      return res.status(404).json({ success: false, message: '해당 날짜에 작성된 일기가 없습니다.' });
+    }
     res.json(result);
   } catch (error) {
     console.error('일기 조회 중 오류:', error);
