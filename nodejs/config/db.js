@@ -90,7 +90,7 @@ function ensureTablesExist() {
       userId BIGINT NOT NULL,
       community_nickname VARCHAR(100),
       diary_text TEXT NOT NULL,
-      analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      analyzed_at DATE DEFAULT CURRENT_DATE,
       sadness DECIMAL(5,2),
       anxiety DECIMAL(5,2),
       anger DECIMAL(5,2),

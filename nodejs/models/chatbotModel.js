@@ -56,9 +56,9 @@ class Chatbot {
     });
   }
 
-  async deleteChatbotResponse(diaryId) {
+  async updateChatbotResponse(diaryId) {
     return new Promise((resolve, reject) => {
-      const sql = 'DELETE FROM chatbot_responses WHERE diary_id = ?';
+      const sql = 'UPDATE chatbot_responses SET response_text = ? WHERE diary_id = ?';
       db.query(sql, [diaryId], (err, result) => {
         if (err) {
           reject(err);

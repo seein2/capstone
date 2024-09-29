@@ -88,7 +88,10 @@ class Diary {
   // 특정 날짜에 작성된 일기 목록 조회 메서드
   static getDiaryByDate(userId, selectedDate) {
     return new Promise((resolve, reject) => {
-      const sql = 'SELECT * FROM diaries WHERE userId = ? AND DATE(analyzed_at) = ?';
+      const sql = `SELECT *, chatbot_response.response_text
+                   FROM diaries 
+                   LEFT JOIN chatbot_responses ON diaries.id = chatbot_response.diary_id
+                   WHERE userId = ? AND DATE(analyzed_at) = ?`;
       db.query(sql, [userId, selectedDate], (err, result) => {
         if (err) reject(err);
         resolve(result);
@@ -110,12 +113,15 @@ class Diary {
 
   static async updateDiaryAndAnalyze(diaryId, diaryText, userId) {
     try {
-      await this.updateDiary(diaryId, diaryText, userId);
-      const emotions = await this.analyzeEmotions(diaryText);
+      await this.updateDiary(diaryId, diaryText, userId); // 일기 수정
+
+      const emotions = await this.analyzeEmotions(diaryText); // 감정분석 수정
       await this.updateEmotionResults(diaryId, emotions);
+
       const communityNickname = await this.getCommunityNickname(userId);
-      const chatbotResponse = await Chatbot.generateResponse(diaryText, emotions, communityNickname);
+      const chatbotResponse = await Chatbot.generateResponse(diaryText, emotions, communityNickname); // 챗봇 수정
       await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
+
       return { message: '일기 및 감정 분석, 챗봇 응답 수정 성공' };
     } catch (error) {
       throw error;
