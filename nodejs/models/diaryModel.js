@@ -3,27 +3,52 @@ const Chatbot = require('./chatbotModel');
 
 class Diary {
   static async processAndSaveDiary(userId, diaryText) {
+    console.log(`일기 처리 시작 - 사용자 ID: ${userId}`);
     try {
       const communityNickname = await this.getCommunityNickname(userId);
+      console.log(`커뮤니티 닉네임 조회 완료: ${communityNickname}`);
+
       if (!communityNickname) {
         throw new Error('커뮤니티 닉네임을 찾을 수 없습니다.');
       }
 
       const emotions = await this.analyzeEmotions(diaryText);
+      console.log('감정 분석 완료:', emotions);
+
       const diaryId = await this.saveDiary(userId, communityNickname, diaryText, emotions.슬픔, emotions.불안, emotions.분노, emotions.행복, emotions.당황);
+      console.log(`일기 저장 완료 - 일기 ID: ${diaryId}`);
 
       const chatbotResponse = await Chatbot.generateResponse(diaryText, emotions, communityNickname);
+      console.log('챗봇 응답 생성 완료');
+
       await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
+      console.log('챗봇 응답 저장 완료');
 
       return {
         success: true,
+        diaryId,
         analysisResult: emotions,
         nickname: communityNickname,
         chatbotResponse,
         message: '감정 분석 결과와 챗봇 응답을 반환했습니다.',
       };
     } catch (error) {
-      throw error;
+      console.error('일기 처리 중 오류 발생:', error);
+
+      // 특정 에러에 대한 커스텀 에러 객체 생성
+      if (error.message === '커뮤니티 닉네임을 찾을 수 없습니다.') {
+        throw {
+          status: 404,
+          message: error.message
+        };
+      }
+
+      // 기타 에러는 일반적인 서버 에러로 처리
+      throw {
+        status: 500,
+        message: '일기 처리 중 오류가 발생했습니다.',
+        error: error.message
+      };
     }
   }
   static async getCommunityNickname(userId) {
@@ -36,20 +61,20 @@ class Diary {
     });
   }
   static async analyzeEmotions(diaryText) {
-    try{
-    const pythonResponse = await axios.post('http://3.37.75.25:5001/predict', { diaryText });
-    const analysisResult = pythonResponse.data;
-    return {
-      슬픔: Math.round(analysisResult.슬픔 * 100) / 100 || 0,
-      불안: Math.round(analysisResult.불안 * 100) / 100 || 0,
-      분노: Math.round(analysisResult.분노 * 100) / 100 || 0,
-      행복: Math.round(analysisResult.행복 * 100) / 100 || 0,
-      당황: Math.round(analysisResult.당황 * 100) / 100 || 0
-    };
-  }catch(error){
-    console.err('감정 분석 중 오류:', error);
-    throw new Error('감정 분석 중 오류');
-  }
+    try {
+      const pythonResponse = await axios.post('http://3.37.75.25:5001/predict', { diaryText });
+      const analysisResult = pythonResponse.data;
+      return {
+        슬픔: Math.round(analysisResult.슬픔 * 100) / 100 || 0,
+        불안: Math.round(analysisResult.불안 * 100) / 100 || 0,
+        분노: Math.round(analysisResult.분노 * 100) / 100 || 0,
+        행복: Math.round(analysisResult.행복 * 100) / 100 || 0,
+        당황: Math.round(analysisResult.당황 * 100) / 100 || 0
+      };
+    } catch (error) {
+      console.err('감정 분석 중 오류:', error);
+      throw new Error('감정 분석 중 오류');
+    }
   }
 
   // 일기 데이터베이스에 저장
@@ -113,7 +138,7 @@ class Diary {
       });
     });
   }
-// 감정 수정
+  // 감정 수정
   static updateEmotionResults(diaryId, emotions) {
     return new Promise((resolve, reject) => {
       const sql = 'UPDATE diaries SET sadness = ?, anxiety = ?, anger = ?, happiness = ?, confusion = ? WHERE id = ?';
