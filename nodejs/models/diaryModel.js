@@ -78,10 +78,12 @@ class Diary {
   // 특정 날짜에 작성된 일기 목록 조회 메서드
   static getDiaryByDate(userId, selectedDate) {
     return new Promise((resolve, reject) => {
-      const sql = `SELECT diaries.*, chatbot_responses.response_text
-                   FROM diaries 
-                   LEFT JOIN chatbot_responses ON diaries.id = chatbot_responses.diary_id
-                   WHERE diaries.userId = ? AND DATE(diaries.analyzed_at) = ?`;
+      const sql = `
+      SELECT diaries.*, chatbot_responses.response_text 
+      FROM diaries 
+      LEFT JOIN chatbot_responses ON diaries.id = chatbot_responses.diary_id 
+      WHERE diaries.userId = ? AND DATE(diaries.analyzed_at) = ?
+    `;
       db.query(sql, [userId, selectedDate], (err, result) => {
         if (err) reject(err);
         resolve(result);
