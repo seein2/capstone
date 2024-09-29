@@ -1,21 +1,20 @@
 const { OpenAI } = require('openai');
 const db = require('../config/db');
 
-// OpenAI API 키 설정
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
-});
+class Chatbot {
+  constructor() {
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
+    });
+  }
 
-const Chatbot = {
-  // GPT-4 API를 호출하여 상담 메시지 생성
-  generateResponse: async (diaryText, emotions, communityNickname) => {
+  async generateResponse(diaryText, emotions, communityNickname) {
     try {
-      // 분석결과 문자열로
       const emotionString = Object.entries(emotions)
         .map(([emotion, value]) => `${emotion}: ${value}%`)
         .join(', ');
 
-      const response = await openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
           {
@@ -34,15 +33,14 @@ const Chatbot = {
         ],
       });
 
-      return response.choices[0].message.content;  // 챗봇의 응답 내용 반환
+      return response.choices[0].message.content;
     } catch (error) {
       console.error('API 호출 중 오류 발생:', error.response ? error.response.data : error.message);
       throw error;
     }
-  },
+  }
 
-  // 챗봇 응답을 데이터베이스에 저장
-  saveChatbotResponse: (diaryId, userId, communityNickname, responseText) => {
+  async saveChatbotResponse(diaryId, userId, communityNickname, responseText) {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO chatbot_responses (diary_id, userId, community_nickname, response_text) 
@@ -50,12 +48,26 @@ const Chatbot = {
       `;
       db.query(sql, [diaryId, userId, communityNickname, responseText], (err) => {
         if (err) {
-          return reject(err);
+          reject(err);
+        } else {
+          resolve();
         }
-        resolve();
       });
     });
   }
-};
 
-module.exports = Chatbot;
+  async deleteChatbotResponse(diaryId) {
+    return new Promise((resolve, reject) => {
+      const sql = 'DELETE FROM chatbot_responses WHERE diary_id = ?';
+      db.query(sql, [diaryId], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+}
+
+module.exports = new Chatbot(); // 싱글톤 인스턴스를 내보냅니다.

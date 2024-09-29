@@ -36,6 +36,7 @@ class Diary {
     });
   }
   static async analyzeEmotions(diaryText) {
+    try{
     const pythonResponse = await axios.post('http://3.37.75.25:5001/predict', { diaryText });
     const analysisResult = pythonResponse.data;
     return {
@@ -45,6 +46,10 @@ class Diary {
       행복: Math.round(analysisResult.행복 * 100) / 100 || 0,
       당황: Math.round(analysisResult.당황 * 100) / 100 || 0
     };
+  }catch(error){
+    console.err('감정 분석 중 오류:', error);
+    throw new Error('감정 분석 중 오류');
+  }
   }
 
   // 일기 데이터베이스에 저장
