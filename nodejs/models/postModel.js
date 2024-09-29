@@ -2,12 +2,13 @@ const db = require('../config/db');
 
 // 게시물 정보 가져오기
 class Post {
-  static getAllWithPaging(page, limit) {
+  static getAllWithPaging(page, limit, userId) {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit;
       const sql = `
         SELECT posts.*, users.community_nickname,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount,
+            (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id AND userId = ?) AS isLiked,
             (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount
         FROM posts
         JOIN users ON posts.userId = users.id
@@ -25,7 +26,10 @@ class Post {
           const totalPages = Math.ceil(totalPosts / limit);
 
           resolve({
-            posts: results,
+            posts: results.map(post => ({
+              ...post,
+              isLiked: post.isLiked > 0, // 좋아요 여부를 boolean으로 반환
+            })),
             totalPosts,
             totalPages,
             currentPage: page
@@ -150,14 +154,14 @@ class Post {
     });
   }
 
-  static async toggleLike(postId, userId){
+  static async toggleLike(postId, userId) {
     const liked = await this.checkIfLiked(postId, userId);
-    if(liked){
+    if (liked) {
       await this.unlike(postId, userId);
-      return {message: '좋아요 취소', action: 'unliked'};
-    }else{
+      return { message: '좋아요 취소', action: 'unliked' };
+    } else {
       await this.like(postId, userId);
-      return{message: '좋아요', actions: 'liked'};
+      return { message: '좋아요', actions: 'liked' };
     }
   }
 

@@ -23,9 +23,10 @@ exports.createPost = async (req, res) => {
 // 게시물 목록 조회 (페이징 적용)
 exports.getAllPostsWithPaging = async (req, res) => {
   try {
+    const userId = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const result = await Post.getAllWithPaging(page, limit);
+    const result = await Post.getAllWithPaging(page, limit, userId);
     res.json(result);
   } catch (err) {
     console.error('게시물 조회 오류:', err);
