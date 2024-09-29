@@ -18,7 +18,7 @@ exports.diaryController = async (req, res) => {
 // 특정 날짜의 일기 목록 조회
 exports.getDiaryByDate = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = parseInt(req.params.userId, 10);
     const { date } = req.query;  // yyyy-mm-dd 형식의 날짜를 query로 받아옴
     const result = await Diary.getDiaryByDate(userId, date);
     res.json(result);
