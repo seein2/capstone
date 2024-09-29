@@ -90,7 +90,7 @@ function ensureTablesExist() {
       userId BIGINT NOT NULL,
       community_nickname VARCHAR(100),
       diary_text TEXT NOT NULL,
-      analyzed_at DATE DEFAULT CURRENT_DATE,
+      analyzed_at DATE DEFAULT (current_date),
       sadness DECIMAL(5,2),
       anxiety DECIMAL(5,2),
       anger DECIMAL(5,2),
@@ -107,7 +107,7 @@ function ensureTablesExist() {
       userId BIGINT NOT NULL,
       community_nickname VARCHAR(100),
       response_text TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_at DATE DEFAULT (current_date),
       CONSTRAINT FK_Diary_Chatbot FOREIGN KEY (diary_id) REFERENCES diaries(id) ON DELETE CASCADE,
       CONSTRAINT FK_User_Chatbot FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );

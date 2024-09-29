@@ -4,26 +4,16 @@ const axios = require('axios');
 
 class Diary {
   static async processAndSaveDiary(userId, diaryText) {
-    console.log(`일기 처리 시작 - 사용자 ID: ${userId}`);
     try {
       const communityNickname = await this.getCommunityNickname(userId);
-      console.log(`커뮤니티 닉네임 조회 완료: ${communityNickname}`);
-
       if (!communityNickname) {
         throw new Error('커뮤니티 닉네임을 찾을 수 없습니다.');
       }
 
       const emotions = await this.analyzeEmotions(diaryText);
-      console.log('감정 분석 완료:', emotions);
-
       const diaryId = await this.saveDiary(userId, communityNickname, diaryText, emotions.슬픔, emotions.불안, emotions.분노, emotions.행복, emotions.당황);
-      console.log(`일기 저장 완료 - 일기 ID: ${diaryId}`);
-
       const chatbotResponse = await Chatbot.generateResponse(diaryText, emotions, communityNickname);
-      console.log('챗봇 응답 생성 완료');
-
       await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
-      console.log('챗봇 응답 저장 완료');
 
       return {
         success: true,
@@ -88,10 +78,10 @@ class Diary {
   // 특정 날짜에 작성된 일기 목록 조회 메서드
   static getDiaryByDate(userId, selectedDate) {
     return new Promise((resolve, reject) => {
-      const sql = `SELECT *, chatbot_response.response_text
+      const sql = `SELECT diaries.*, chatbot_responses.response_text
                    FROM diaries 
-                   LEFT JOIN chatbot_responses ON diaries.id = chatbot_response.diary_id
-                   WHERE userId = ? AND DATE(analyzed_at) = ?`;
+                   LEFT JOIN chatbot_responses ON diaries.id = chatbot_responses.diary_id
+                   WHERE diaries.userId = ? AND DATE(diaries.analyzed_at) = ?`;
       db.query(sql, [userId, selectedDate], (err, result) => {
         if (err) reject(err);
         resolve(result);
@@ -99,7 +89,7 @@ class Diary {
     });
   }
 
-  // 사용자가 작성한 모든 일기 조회
+  // 사용자가 작성한 모든 일기 조회 (일단 안씀)
   static getUserDiaries(userId) {
     return new Promise((resolve, reject) => {
       const sql = 'SELECT * FROM diaries WHERE userId = ? ORDER BY analyzed_at DESC';
@@ -109,7 +99,6 @@ class Diary {
       });
     });
   }
-
 
   static async updateDiaryAndAnalyze(diaryId, diaryText, userId) {
     try {
