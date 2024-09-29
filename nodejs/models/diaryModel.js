@@ -34,7 +34,7 @@ class Diary {
       };
     } catch (error) {
       console.error('일기 처리 중 오류 발생:', error);
-
+      
       if (error.message === '커뮤니티 닉네임을 찾을 수 없습니다.') {
         throw new Error('커뮤니티 닉네임을 찾을 수 없습니다.');
       }
@@ -65,7 +65,7 @@ class Diary {
         당황: Math.round(analysisResult.당황 * 100) / 100 || 0
       };
     } catch (error) {
-      console.err('감정 분석 중 오류:', error);
+      console.error('감정 분석 중 오류:', error);
       throw new Error('감정 분석 중 오류');
     }
   }
