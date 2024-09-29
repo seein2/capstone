@@ -21,10 +21,10 @@ exports.getDiaryByDate = async (req, res) => {
     const {userId} = req.params;
     const { date } = req.query;  // yyyy-mm-dd 형식의 날짜를 query로 받아옴
     const result = await Diary.getDiaryByDate(userId, date);
-    if (diaries.length === 0) {
+    if (result.length === 0) {
       return res.status(404).json({ success: false, message: '해당 날짜에 작성된 일기가 없습니다.' });
     }
-    res.json(result);
+    res.json({ success: true, diaries: result });
   } catch (error) {
     console.error('일기 조회 중 오류:', error);
     res.status(500).json({ success: false, message: '일기 조회 중 오류가 발생했습니다.' });
