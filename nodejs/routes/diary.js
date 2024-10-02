@@ -14,7 +14,7 @@ router.get('/diaries/:userId', authenticateToken, diaryController.getDiaryByDate
 router.get('/diaries', authenticateToken, diaryController.getAllDiaries);
 
 // 일기 수정
-router.put('/diaries/update', authenticateToken, diaryController.updateDiary);
+router.put('/diaries/update/:diaryId', authenticateToken, diaryController.updateDiary);
 
 // 일기 삭제
 router.delete('/diaries/delete/:diaryId', authenticateToken, diaryController.deleteDiary);

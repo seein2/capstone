@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 class Comment {
   // 특정 게시물의 모든 댓글을 가져오기 (작성자 닉네임 및 좋아요 수 포함)
-  static getAllByPostId(postId) {
+  static getAllByPostId(postId, userId) {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT comments.*, users.community_nickname,
@@ -11,9 +11,9 @@ class Comment {
         FROM comments
         JOIN users ON comments.userId = users.id
         WHERE comments.postId = ?
-        ORDER BY comments.createdAt ASC
+        ORDER BY comments.createdAt DESC
       `;
-      db.query(sql, [postId], (err, results) => {
+      db.query(sql, [userId, postId], (err, results) => {
         if (err) return reject(err);
         resolve(results.map(comment => ({
           ...comment,

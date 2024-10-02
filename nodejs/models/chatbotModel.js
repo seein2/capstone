@@ -19,7 +19,7 @@ class Chatbot {
         messages: [
           {
             role: 'system',
-            content: `너는 사용자의 (닉네임 ${communityNickname})의 일기를 읽고 조언을 해주는 상담사야. 
+            content: `너는 사용자의 (닉네임: ${communityNickname})의 일기를 읽고 조언을 해주는 상담사야. 
             일기를 토대로 분석된 감정 수치를 적절하게 잘 사용하여 사용자에게 조언이나 코멘트를 남겨줘. 
             분석된 감정이 적절하지 않다는 말은 하지 말고 분석된 감정을 절대적으로 사용해.
             분석된 감정에서 부정적 감정이 높다면 적절한 컨텐츠를 추천해줘도 좋아.
@@ -70,4 +70,4 @@ class Chatbot {
   }
 }
 
-module.exports = new Chatbot(); // 싱글톤 인스턴스를 내보냅니다.
+module.exports = new Chatbot(); // 싱글톤 인스턴스
