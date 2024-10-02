@@ -46,7 +46,8 @@ exports.getAllDiaries = async (req, res) => {
 // 일기 수정 및 감정 분석/챗봇 응답 갱신
 exports.updateDiary = async (req, res) => {
   try {
-    const { diaryId, diaryText } = req.body;
+    const {diaryId} = req.params;
+    const { diaryText } = req.body;
     const userId = req.user.id;
     const result = await Diary.updateDiaryAndAnalyze(diaryId, diaryText, userId);
     res.json(result);
