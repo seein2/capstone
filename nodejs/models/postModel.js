@@ -74,8 +74,8 @@ class Post {
         if (err) {
           reject(err);
         } else {
-          const postOwnerId = results[0]?.userID;
-          if (postOwnerId !== userID && !isAdmin) {
+          const postOwnerId = results[0]?.userId;
+          if (postOwnerId !== userId && !isAdmin) {
             resolve({ message: '게시물 수정 권한이 없습니다.', status: 403 });
             // resolve : 비동기 작업에서 promise가 완료되었을 때 호출 (결과 전달)
 
@@ -105,8 +105,8 @@ class Post {
           if (results.length == 0) {
             resolve({ message: '게시글을 찾을 수 없습니다.', status: 404 });
           } else {
-            const postOwnerId = results[0].userID;
-            if (postOwnerId === userId || req.user.isAdmin) {
+            const postOwnerId = results[0].userId;
+            if (postOwnerId === userId || isAdmin) {
               const deleteSql = 'DELETE FROM posts WHERE id = ?';
               db.query(deleteSql, [postId], (deleteErr) => {
                 if (deleteErr) reject(deleteErr);
