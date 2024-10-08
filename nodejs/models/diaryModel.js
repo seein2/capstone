@@ -92,7 +92,7 @@ class Diary {
   }
 
   // 사용자가 작성한 모든 일기 조회 (일단 안씀)
-  static getUserDiaries(userId) {
+  static getAllDiaries(userId) {
     return new Promise((resolve, reject) => {
       const sql = 'SELECT * FROM diaries WHERE userId = ? ORDER BY analyzed_at DESC';
       db.query(sql, [userId], (err, results) => {

@@ -1,5 +1,4 @@
 const Diary = require('../models/diaryModel');
-const Chatbot = require('../models/chatbotModel');
 
 exports.diaryController = async (req, res) => {
   try {

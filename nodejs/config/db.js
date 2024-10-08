@@ -113,6 +113,17 @@ function ensureTablesExist() {
     );
   `;
 
+  // 추천디비 (추천을 어떤식으로 할지 모르겠음)
+  const recommendTableSql = `
+    CREATE TABLE IF NOT EXISTS user_recommendations (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      userId BIGINT NOT NULL,
+      recommendations TEXT NOT NULL,
+      created_at DATE DEFAULT (current_date),
+      CONSTRAINT FK_User_Recommendation FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  );
+  `
+
   const queries = [
     userTableSql,
     postTableSql,
@@ -120,7 +131,8 @@ function ensureTablesExist() {
     commentTableSql,
     commentLikeTableSql,
     diaryTableSql,
-    chatbotResponseTableSql
+    chatbotResponseTableSql,
+    recommendTableSql
   ];
 
   // 각 쿼리를 순차적으로 실행

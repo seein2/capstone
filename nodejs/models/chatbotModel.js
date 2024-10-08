@@ -8,6 +8,7 @@ class Chatbot {
     });
   }
 
+  // 코멘트챗봇임
   async generateResponse(diaryText, emotions, communityNickname) {
     try {
       const emotionString = Object.entries(emotions)
@@ -64,6 +65,74 @@ class Chatbot {
           reject(err);
         } else {
           resolve(result);
+        }
+      });
+    });
+  }
+  // 여기까지 코멘트챗봇
+
+  // 추천관련챗봇임
+  async generateRecommendations(userId, emotionTrends, averageNegativeEmotions) {
+    try {
+      const emotionTrendsString = JSON.stringify(emotionTrends);
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: `너는 사용자의 감정 변화 추이를 분석하고 적절한 활동이나 콘텐츠를 추천하는 웰빙 전문가야. 
+            감정 변화의 폭이 크거나 부정적 감정이 높은 경우에 특히 주의해. 
+            추천은 구체적이고 실행 가능해야 하며, 사용자의 정서적 웰빙을 향상시키는 데 도움이 되어야 해.`,
+          },
+          {
+            role: 'user',
+            content: `사용자의 감정 변화 추이: ${emotionTrendsString}
+            평균 부정적 감정 수치: ${averageNegativeEmotions}
+            
+            이 데이터를 바탕으로 사용자에게 도움이 될 만한 3-5개의 구체적인 활동이나 콘텐츠를 추천해.`,
+          },
+        ],
+        max_tokens: 500,
+      });
+
+      return response.choices[0].message.content;
+    } catch (error) {
+      console.error('추천 생성 중 오류 발생:', error);
+      throw error;
+    }
+  }
+
+  async saveRecommendations(userId, recommendations) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT INTO user_recommendations (userId, recommendations, created_at) 
+        VALUES (?, ?, NOW())
+      `;
+      db.query(sql, [userId, JSON.stringify(recommendations)], (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  async getLatestRecommendations(userId) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT recommendations, created_at 
+        FROM user_recommendations 
+        WHERE userId = ? 
+        ORDER BY created_at DESC 
+        LIMIT 1
+      `;
+      db.query(sql, [userId], (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results[0] ? JSON.parse(results[0].recommendations) : null);
         }
       });
     });
