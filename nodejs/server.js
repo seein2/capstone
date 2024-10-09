@@ -12,7 +12,7 @@ const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const diaryRouter = require('./routes/diary');
 const profileRoutes = require('./routes/profileRoutes');
-const recommendRoutes = reuqire('./routes/recommendRoutes');
+const recommendRoutes = require('./routes/recommendRoutes');
 const serviceAccount = require('./firebase-admin-key.json');
 
 // 웹 관련 (세션임)

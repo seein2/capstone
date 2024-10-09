@@ -4,7 +4,7 @@ const Chatbot = require('../models/chatbotModel');
 exports.getRecommendations = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate } = req.body;
 
         // 특정 기간동안의 감정 추이를 구하고
         const emotionTrends = await Recommend.getEmotionTrends(userId, startDate, endDate);
