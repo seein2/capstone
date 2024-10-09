@@ -6,10 +6,13 @@ exports.getRecommendations = async (req, res) => {
         const userId = req.user.id;
         const { startDate, endDate } = req.query;
 
+        // 특정 기간동안의 감정 추이를 구하고
         const emotionTrends = await Recommend.getEmotionTrends(userId, startDate, endDate);
-        const averageNegativeEmotions = Recommend.negativeEmotions(emotionTrends);
+        // 구한 감정을 사용하여 부정감정의 평균을 구함
+        const negativeEmotions = Recommend.negativeEmotions(emotionTrends);
 
-        const recommendations = await Chatbot.generateRecommendations(userId, emotionTrends, averageNegativeEmotions);
+        // 감정 추이와 부정 감정을 챗봇에게 전달하여 추천을 받음
+        const recommendations = await Chatbot.generateRecommendations(userId, emotionTrends, negativeEmotions);
         await Chatbot.saveRecommendations(userId, recommendations);
 
         res.json({ success: true, recommendations });

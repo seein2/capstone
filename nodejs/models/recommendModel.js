@@ -17,7 +17,7 @@ class Recommend {
         });
     }
 
-    // 부정적 감정의 평균?
+    // 부정적 감정의 평균
     static negativeEmotions(emotionData) {
         const negativeEmotions = ['sadness', 'anxiety', 'anger'];
         const sum = emotionData.reduce((acc, data) => {

@@ -12,6 +12,7 @@ const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const diaryRouter = require('./routes/diary');
 const profileRoutes = require('./routes/profileRoutes');
+const recommendRoutes = reuqire('./routes/recommendRoutes');
 const serviceAccount = require('./firebase-admin-key.json');
 
 // 웹 관련 (세션임)
@@ -67,6 +68,7 @@ app.use('/profile', profileRoutes); // 사용자 정보 관련 라우트
 app.use('/community', postRoutes); // 게시물 관련 라우트
 app.use('/community', commentRoutes); // 댓글 관련 라우트
 app.use('/diary', diaryRouter); // 다이어리 관련 라우트
+app.use('/recommend', recommendRoutes); // 추천
 
 // 'settings' 경로에 대한 라우트
 app.get('/settings', (req, res) => {
