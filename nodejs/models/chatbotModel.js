@@ -71,7 +71,7 @@ class Chatbot {
   }
   // 여기까지 코멘트챗봇
 
-  // 추천관련챗봇임
+  // 추천관련챗봇
   async generateRecommendations(userId, emotionTrends, averageNegativeEmotions) {
     try {
       const emotionTrendsString = JSON.stringify(emotionTrends);
@@ -81,7 +81,7 @@ class Chatbot {
         messages: [
           {
             role: 'system',
-            content: `너는 사용자의 감정 변화 추이를 분석하고 적절한 활동이나 콘텐츠를 추천하는 상담사야. 
+            content: `사용자의 감정 변화 추이를 분석하고 적절한 활동이나 콘텐츠를 추천해줘. 
             감정 변화의 폭이 크거나 부정적 감정이 높은 경우에 알맞게 추천해줘.`,
           },
           {
@@ -89,10 +89,16 @@ class Chatbot {
             content: `사용자의 감정 변화 추이: ${emotionTrendsString}
             평균 부정적 감정 수치: ${averageNegativeEmotions}
             
-            이 데이터를 바탕으로 사용자에게 도움이 될 만한 3가지의 도서를 추천하고, 3가지의 유투브 링크를 걸어줘`,
+            이 데이터를 바탕으로 사용자에게 도움이 될만한 3가지의 음악, 3가지의 도서, 3가지의 유투브 링크를 이스케이프 문자 떼고 보내줘.
+            음악: 1. ("제목"-"가수") [링크]/n2. ("제목"-"가수") [링크]/n3. ("제목"-"가수") [링크]/n
+            도서: 1. ("도서명"-"저자")[링크] /n 2. ("도서명"-"저자")[링크] /n 3. ("도서명"-"저자"[)링크] /n
+            영상: 1. "영상제목"-"영상설명"[링크]/n 2. "영상제목"-"영상설명"[링크]/n 3. "영상제목"-"영상설명"[링크]/n
+            이런 형식으로 링크는 []안에 넣어서 보내.
+            음악은 spotify 링크, 도서는 yes24 링크, 영상은 youtube 링크로 실제로 존재하는 구체적인 주소여야돼.
+            `,
           },
         ],
-        max_tokens: 500,
+        max_tokens: 1000,
       });
 
       return response.choices[0].message.content;
@@ -118,24 +124,24 @@ class Chatbot {
     });
   }
 
-  async getLatestRecommendations(userId) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        SELECT recommendations, created_at 
-        FROM user_recommendations 
-        WHERE userId = ? 
-        ORDER BY created_at DESC 
-        LIMIT 1
-      `;
-      db.query(sql, [userId], (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results[0] ? JSON.parse(results[0].recommendations) : null);
-        }
-      });
-    });
-  }
+  // async getLatestRecommendations(userId) {
+  //   return new Promise((resolve, reject) => {
+  //     const sql = `
+  //       SELECT recommendations, created_at 
+  //       FROM user_recommendations 
+  //       WHERE userId = ? 
+  //       ORDER BY created_at DESC 
+  //       LIMIT 1
+  //     `;
+  //     db.query(sql, [userId], (err, results) => {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         resolve(results[0] ? JSON.parse(results[0].recommendations) : null);
+  //       }
+  //     });
+  //   });
+  // }
 }
 
 module.exports = new Chatbot(); // 싱글톤 인스턴스

@@ -2,8 +2,8 @@ const Diary = require('../models/diaryModel');
 
 exports.diaryController = async (req, res) => {
   try {
-    const { userId, diaryText } = req.body;
-    const result = await Diary.processAndSaveDiary(userId, diaryText);
+    const { userId, diaryText, selectDate } = req.body;
+    const result = await Diary.processAndSaveDiary(userId, diaryText, selectDate);
     res.json(result);
   } catch (error) {
     console.error('서버 오류:', error);
@@ -17,7 +17,7 @@ exports.diaryController = async (req, res) => {
 // 특정 날짜의 일기 목록 조회
 exports.getDiaryByDate = async (req, res) => {
   try {
-    const {userId} = req.params;
+    const { userId } = req.params;
     const { date } = req.query;  // yyyy-mm-dd 형식의 날짜를 query로 받아옴
     const result = await Diary.getDiaryByDate(userId, date);
     if (result.length === 0) {
@@ -45,7 +45,7 @@ exports.getAllDiaries = async (req, res) => {
 // 일기 수정 및 감정 분석/챗봇 응답 갱신
 exports.updateDiary = async (req, res) => {
   try {
-    const {diaryId} = req.params;
+    const { diaryId } = req.params;
     const { diaryText } = req.body;
     const userId = req.user.id;
     const result = await Diary.updateDiaryAndAnalyze(diaryId, diaryText, userId);

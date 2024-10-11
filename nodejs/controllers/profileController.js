@@ -69,11 +69,12 @@ exports.editProfile = (req, res) => {
     const { nickname, icon } = req.body;
     const userId = req.user.id;
 
-    if (!nickname) {
-        return res.status(400).json({ error: '닉네임은 필수 입력 항목입니다.' });
-    }
-
-    const sql = 'UPDATE users SET community_nickname = ?, community_icon = ? WHERE id = ?';
+    const sql = `
+        UPDATE users 
+        SET community_nickname = COALESCE(?, community_nickname),
+            community_icon = COALESCE(?, community_icon)
+        WHERE id = ?
+    `;
     db.query(sql, [nickname, icon, userId], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -86,6 +87,7 @@ exports.editProfile = (req, res) => {
         res.json({ success: true });
     });
 };
+
 
 // 사용자 정보 가져오기 (로그인된 사용자의 ID 및 권한)
 exports.getUserInfo = (req, res) => {

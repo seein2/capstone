@@ -3,7 +3,7 @@ const Chatbot = require('./chatbotModel');
 const axios = require('axios');
 
 class Diary {
-  static async processAndSaveDiary(userId, diaryText) {
+  static async processAndSaveDiary(userId, diaryText, selectDate) {
     try {
       const communityNickname = await this.getCommunityNickname(userId);
       if (!communityNickname) {
@@ -11,7 +11,7 @@ class Diary {
       }
 
       const emotions = await this.analyzeEmotions(diaryText);
-      const diaryId = await this.saveDiary(userId, communityNickname, diaryText, emotions.슬픔, emotions.불안, emotions.분노, emotions.행복, emotions.당황);
+      const diaryId = await this.saveDiary(userId, communityNickname, diaryText, selectDate, emotions.슬픔, emotions.불안, emotions.분노, emotions.행복, emotions.당황);
       const chatbotResponse = await Chatbot.generateResponse(diaryText, emotions, communityNickname);
       await Chatbot.saveChatbotResponse(diaryId, userId, communityNickname, chatbotResponse);
 
@@ -62,13 +62,13 @@ class Diary {
   }
 
   // 일기 데이터베이스에 저장
-  static saveDiary(userId, communityNickname, diaryText, sadness, anxiety, anger, happiness, confusion) {
+  static saveDiary(userId, communityNickname, diaryText, selectDate, sadness, anxiety, anger, happiness, confusion) {
     return new Promise((resolve, reject) => {
       const sql = `
-        INSERT INTO diaries (userId, community_nickname, diary_text, sadness, anxiety, anger, happiness, confusion) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO diaries (userId, community_nickname, diary_text, analyzed_at, sadness, anxiety, anger, happiness, confusion) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      db.query(sql, [userId, communityNickname, diaryText, sadness, anxiety, anger, happiness, confusion], (err, result) => {
+      db.query(sql, [userId, communityNickname, diaryText, selectDate, sadness, anxiety, anger, happiness, confusion], (err, result) => {
         if (err) return reject(err);
         resolve(result.insertId);  // 저장된 일기의 ID 반환
       });
@@ -91,7 +91,7 @@ class Diary {
     });
   }
 
-  // 사용자가 작성한 모든 일기 조회 (일단 안씀)
+  // 사용자가 작성한 모든 일기 조회 
   static getAllDiaries(userId) {
     return new Promise((resolve, reject) => {
       const sql = 'SELECT * FROM diaries WHERE userId = ? ORDER BY analyzed_at DESC';

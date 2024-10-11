@@ -6,7 +6,7 @@ class Post {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit;
       const sql = `
-        SELECT posts.*, users.community_nickname,
+        SELECT posts.*, users.community_nickname, users.community_icon,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id AND userId = ?) AS isLiked,
             (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount

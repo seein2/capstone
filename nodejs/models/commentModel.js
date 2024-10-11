@@ -5,7 +5,7 @@ class Comment {
   static getAllByPostId(postId, userId) {
     return new Promise((resolve, reject) => {
       const sql = `
-        SELECT comments.*, users.community_nickname,
+        SELECT comments.*, users.community_nickname, users.community_icon,
           (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id AND userId = ?) AS isLiked,
           (SELECT COUNT(*) FROM comment_likes WHERE commentId = comments.id) AS likeCount
         FROM comments
