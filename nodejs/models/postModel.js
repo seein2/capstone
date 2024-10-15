@@ -182,7 +182,7 @@ class Post {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT posts.*, 
-            users.community_nickname,
+            users.community_nickname, users.community_icon,
             (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
         FROM posts
         JOIN users ON posts.userId = users.id
