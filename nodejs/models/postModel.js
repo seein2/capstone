@@ -181,9 +181,9 @@ class Post {
   static getMyPosts(userId) {
     return new Promise((resolve, reject) => {
       const sql = `
-        SELECT posts.*, 
-            users.community_nickname, users.community_icon,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount
+        SELECT posts.*, users.community_nickname, users.community_icon,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.postId = posts.id) AS likeCount,
+            (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount
         FROM posts
         JOIN users ON posts.userId = users.id
         WHERE posts.userId = ?

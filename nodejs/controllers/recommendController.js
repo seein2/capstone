@@ -21,3 +21,18 @@ exports.getRecommendations = async (req, res) => {
         res.status(500).json({ success: false, message: '추천 생성 중 오류가 발생했습니다.' });
     }
 };
+
+exports.getLatestRecommendations = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const result = await Recommend.getLatestRecommendations(userId);
+
+        if (!result || result.length === 0) {
+            console.log('Empty result received');
+            return res.status(204).json({ success: true, message: '추천 결과가 없습니다.' });
+        }
+        return res.json({ success: true, result });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: '추천 내용을 불러오는 중 오류 발생' });
+    }
+};

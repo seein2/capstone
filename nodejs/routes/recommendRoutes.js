@@ -6,4 +6,6 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 
 router.post('/',authenticateToken, recommendController.getRecommendations);
 
+router.get('/getrecommend', authenticateToken, recommendController.getLatestRecommendations);
+
 module.exports = router;

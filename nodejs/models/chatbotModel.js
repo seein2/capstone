@@ -4,7 +4,7 @@ const db = require('../config/db');
 class Chatbot {
   constructor() {
     this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY // 환경 변수에서 API 키를 불러옴
+      apiKey: process.env.JISEOK // 환경 변수에서 API 키를 불러옴
     });
   }
 
@@ -94,7 +94,7 @@ class Chatbot {
             도서: 1. ("도서명"-"저자")[링크] /n 2. ("도서명"-"저자")[링크] /n 3. ("도서명"-"저자"[)링크] /n
             영상: 1. "영상제목"-"영상설명"[링크]/n 2. "영상제목"-"영상설명"[링크]/n 3. "영상제목"-"영상설명"[링크]/n
             이런 형식으로 링크는 []안에 넣어서 보내.
-            음악은 spotify 링크, 도서는 yes24 링크, 영상은 youtube 링크로 실제로 존재하는 구체적인 주소여야돼.
+            음악은 spotify 링크, 도서는 교보문고 링크, 영상은 youtube 링크로 실제로 존재하는 구체적인 주소여야돼.
             `,
           },
         ],
@@ -123,25 +123,6 @@ class Chatbot {
       });
     });
   }
-
-  // async getLatestRecommendations(userId) {
-  //   return new Promise((resolve, reject) => {
-  //     const sql = `
-  //       SELECT recommendations, created_at 
-  //       FROM user_recommendations 
-  //       WHERE userId = ? 
-  //       ORDER BY created_at DESC 
-  //       LIMIT 1
-  //     `;
-  //     db.query(sql, [userId], (err, results) => {
-  //       if (err) {
-  //         reject(err);
-  //       } else {
-  //         resolve(results[0] ? JSON.parse(results[0].recommendations) : null);
-  //       }
-  //     });
-  //   });
-  // }
 }
 
 module.exports = new Chatbot(); // 싱글톤 인스턴스

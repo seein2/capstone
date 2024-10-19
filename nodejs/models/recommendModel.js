@@ -25,6 +25,26 @@ class Recommend {
         }, 0);
         return sum / (emotionData.length * negativeEmotions.length);
     }
+
+    // 가장 최근 추천 내용
+    static async getLatestRecommendations(userId) {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT recommendations, created_at 
+                FROM user_recommendations 
+                WHERE userId = ? 
+                ORDER BY created_at DESC 
+                LIMIT 1
+            `;
+            db.query(sql, [userId], (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    }
 }
 
 module.exports = Recommend;
