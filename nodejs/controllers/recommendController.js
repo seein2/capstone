@@ -6,16 +6,24 @@ exports.getRecommendations = async (req, res) => {
         const userId = req.user.id;
         const { startDate, endDate } = req.body;
 
-        // 특정 기간동안의 감정 추이를 구하고
+        // 특정 기간동안의 감정 추이
         const emotionTrends = await Recommend.getEmotionTrends(userId, startDate, endDate);
+
         // 구한 감정을 사용하여 부정감정의 평균을 구함
-        const negativeEmotions = Recommend.negativeEmotions(emotionTrends);
+        // const negativeEmotions = Recommend.negativeEmotions(emotionTrends);
+
+        // 주요 감정 파악
+        const mainEmotion = Recommend.getMainEmotion(emotionTrends)
 
         // 감정 추이와 부정 감정을 챗봇에게 전달하여 추천을 받음
-        const recommendations = await Chatbot.generateRecommendations(userId, emotionTrends, negativeEmotions);
-        await Chatbot.saveRecommendations(userId, recommendations);
+        // const recommendations = await Chatbot.generateRecommendations(userId, emotionTrends, negativeEmotions);
 
-        res.json({ success: true, recommendations });
+        // 추천 조회
+        const contents = await Recommend.getContent(mainEmotion)
+
+        await Recommend.saveRecommendations(userId, contents);
+
+        res.json({ success: true, contents, mainEmotion});
     } catch (error) {
         console.error('추천 생성 중 오류:', error);
         res.status(500).json({ success: false, message: '추천 생성 중 오류가 발생했습니다.' });

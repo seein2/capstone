@@ -113,7 +113,18 @@ function ensureTablesExist() {
     );
   `;
 
-  // 추천디비 (추천을 어떤식으로 할지 모르겠음)
+  // 추천디비
+  const recommendationsTableSql = `
+    CREATE TABLE contents (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      content_type ENUM('MUSIC', 'BOOK', 'VIDEO') NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      creator VARCHAR(255) NOT NULL,
+      link VARCHAR(512) NOT NULL,
+      emotion_type ENUM('sadness', 'anxiety', 'anger', 'happiness', 'confusion') NOT NULL,
+      created_at DATE DEFAULT (current_date)
+  );
+  `
   const recommendTableSql = `
     CREATE TABLE IF NOT EXISTS user_recommendations (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -132,6 +143,7 @@ function ensureTablesExist() {
     commentLikeTableSql,
     diaryTableSql,
     chatbotResponseTableSql,
+    recommendationsTableSql,
     recommendTableSql
   ];
 
