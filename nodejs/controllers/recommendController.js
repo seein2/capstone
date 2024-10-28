@@ -8,13 +8,19 @@ exports.getRecommendations = async (req, res) => {
 
         // 특정 기간동안의 감정 추이
         const emotionTrends = await Recommend.getEmotionTrends(userId, startDate, endDate);
-
+        if (!emotionTrends || emotionTrends.length === 0) {
+            console.log('No emotion data found');
+            return res.status(404).json({
+                success: false,
+                message: '해당 기간의 감정 데이터가 없습니다.'
+            });
+        }
         // 구한 감정을 사용하여 부정감정의 평균을 구함
         // const negativeEmotions = Recommend.negativeEmotions(emotionTrends);
 
         // 주요 감정 파악
         const mainEmotion = Recommend.getMainEmotion(emotionTrends)
-
+        
         // 감정 추이와 부정 감정을 챗봇에게 전달하여 추천을 받음
         // const recommendations = await Chatbot.generateRecommendations(userId, emotionTrends, negativeEmotions);
 
@@ -23,7 +29,7 @@ exports.getRecommendations = async (req, res) => {
 
         await Recommend.saveRecommendations(userId, contents);
 
-        res.json({ success: true, contents, mainEmotion});
+        res.json({ success: true, contents, mainEmotion });
     } catch (error) {
         console.error('추천 생성 중 오류:', error);
         res.status(500).json({ success: false, message: '추천 생성 중 오류가 발생했습니다.' });

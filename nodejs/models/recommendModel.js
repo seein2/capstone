@@ -47,7 +47,6 @@ class Recommend {
 
     // 추천 콘텐츠 조회
     static async getContent(emotion) {
-
         // 특정 감정 랜덤으로 9개 추출
         const sql = `
         SELECT content_type, title, creator, link
@@ -82,7 +81,7 @@ class Recommend {
                 SELECT recommendations, created_at 
                 FROM user_recommendations 
                 WHERE userId = ? 
-                ORDER BY created_at DESC 
+                ORDER BY id DESC
                 LIMIT 1
             `;
             db.query(sql, [userId], (err, results) => {

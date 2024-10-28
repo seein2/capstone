@@ -115,7 +115,7 @@ function ensureTablesExist() {
 
   // 추천디비
   const recommendationsTableSql = `
-    CREATE TABLE contents (
+    CREATE TABLE IF NOT EXISTS contents (
       id INT AUTO_INCREMENT PRIMARY KEY,
       content_type ENUM('MUSIC', 'BOOK', 'VIDEO') NOT NULL,
       title VARCHAR(255) NOT NULL,
