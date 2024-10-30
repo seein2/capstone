@@ -29,6 +29,12 @@
 - **APIs**:
 - OpenAI API (GPT-4 기반 일기 분석 및 응답 생성)
 - 감정 분석 API (KcELECTRA 기반 감정 분석 서버)
+- ***DevOps***:
+- Docker
+- Docker Compose
+- 컨테이너화된 서비스:
+  - Node.js 서버 (mood_nodejs)
+  - Python 감정 분석 서버 (mood_flask)
 
 ## 📊 데이터베이스 구조
 ### Users Table
@@ -61,17 +67,19 @@
 
 ## 🔍 주요 API 엔드포인트
 ```
-POST /diary - 일기 작성
-GET /diary/:date - 특정 날짜의 일기 조회
-PUT /diary/:id - 일기 수정
-DELETE /diary/:id - 일기 삭제
+POST /diary/analyze - 일기 작성 및 코멘트 반환
+GET /diary/diaries/:userId - 특정 날짜의 일기 조회
+GET /diary/diaries - 전체 일기 목록 조회
 
 GET /recommend - 맞춤 컨텐츠 추천
-GET /recommend/trends - 감정 변화 추이 조회
+GET /recommend/getrecommend - 감정 변화 추이 조회
 
-POST /posts - 게시글 작성
-GET /posts - 게시글 목록 조회
-PUT /posts/:id - 게시글 수정
-DELETE /posts/:id - 게시글 삭제
-POST /posts/:id/like - 게시글 좋아요
+POST /community/create - 게시글 작성
+GET /community/posts - 게시글 목록 조회
+PUT /community/posts/:id - 게시글 수정
+DELETE /community/posts/:id - 게시글 삭제
+POST /community/posts/:id/like - 게시글 좋아요 및 취소
+
+GET /profile/profile - 프로필 정보
+PUT /profile/profile/edit - 프로필 수정
 ```
