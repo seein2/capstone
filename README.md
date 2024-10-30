@@ -23,12 +23,12 @@
 ## 🛠 기술 스택
 - **Backend**: Node.js, flask
 - **Database**: MySQL
-- **AI/ML**:
+- **AI**:
   - 감정 분석: 파인튜닝된 [KcELECTRA](https://github.com/Beomi/KcELECTRA) 모델
   - 챗봇: OpenAI GPT-4
 - **APIs**:
-  - OpenAI API
-  - Custom Emotion Analysis API
+- OpenAI API (GPT-4 기반 일기 분석 및 응답 생성)
+- 감정 분석 API (KcELECTRA 기반 감정 분석 서버)
 
 ## 📊 데이터베이스 구조
 ### Users Table
@@ -75,6 +75,3 @@ PUT /posts/:id - 게시글 수정
 DELETE /posts/:id - 게시글 삭제
 POST /posts/:id/like - 게시글 좋아요
 ```
-
-## 📖 라이선스
-MIT License
