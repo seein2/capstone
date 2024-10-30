@@ -83,3 +83,76 @@ POST /community/posts/:id/like - 게시글 좋아요 및 취소
 GET /profile/profile - 프로필 정보
 PUT /profile/profile/edit - 프로필 수정
 ```
+
+## 🏗 시스템 아키텍처
+
+### 전체 시스템 구조
+```mermaid
+flowchart TB
+    subgraph Client
+        MobileApp[모바일 앱]
+    end
+
+    subgraph "Docker Containers"
+        direction TB
+        subgraph "Node.js Server Container"
+            NodeJS[Node.js API 서버]
+            GPT4[GPT-4 통합]
+        end
+        
+        subgraph "Python Server Container"
+            Flask[감정 분석 서버]
+            KcELECTRA[KcELECTRA 모델]
+        end
+    end
+
+    subgraph "Database"
+        MySQL[(MySQL DB)]
+        ContentDB[(컨텐츠 DB)]
+    end
+
+    MobileApp -->|API 요청| NodeJS
+    NodeJS -->|감정 분석 요청| Flask
+    Flask -->|분석 결과| NodeJS
+    NodeJS -->|일기 분석 요청| GPT4
+    GPT4 -->|분석 응답| NodeJS
+    NodeJS -->|데이터 저장/조회| MySQL
+    NodeJS -->|컨텐츠 조회| ContentDB
+```
+
+### 데이터 흐름도
+```mermaid
+sequenceDiagram
+    actor User
+    participant App
+    participant NodeJS
+    participant Flask
+    participant GPT4
+    participant DB
+
+    User->>App: 일기 작성
+    App->>NodeJS: 일기 텍스트 전송
+    NodeJS->>Flask: 감정 분석 요청
+    Flask-->>NodeJS: 감정 분석 결과
+    NodeJS->>GPT4: 일기 내용 + 감정 분석 결과
+    GPT4-->>NodeJS: 맞춤형 응답
+    NodeJS->>DB: 일기 및 분석 결과 저장
+    NodeJS->>DB: 감정 기반 컨텐츠 조회
+    DB-->>NodeJS: 추천 컨텐츠
+    NodeJS-->>App: 최종 응답
+    App-->>User: 결과 표시
+```
+
+### 주요 기능별 처리 흐름
+
+1. **일기 작성 및 분석**
+   - 사용자 일기 작성 → 감정 분석 (KcELECTRA) → GPT-4 응답 생성 → 결과 저장 및 반환
+
+2. **감정 기반 컨텐츠 추천**
+   - 감정 분석 결과 → 주요 감정 도출 → 감정별 컨텐츠 매칭 → 음악/도서/영상 추천
+
+3. **커뮤니티 기능**
+   - 게시글 CRUD → 좋아요/댓글 → 실시간 알림
+
+4. **데이터 분석**
+   - 감정 변화 추이 분석 → 시각화 → 인사이트 제공

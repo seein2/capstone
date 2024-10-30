@@ -8,19 +8,19 @@ services:
     platform: linux/amd64
     ports:
       - "3000:3000"
-    # environment:
-    #   DATABASE_HOST: 
-    #   DATABASE_USER: root
-    #   DATABASE_PASSWORD: Gomintj67;
-    #   DATABASE_NAME: mood
+    environment:
+      DATABASE_HOST: 
+      DATABASE_USER: root
+      DATABASE_PASSWORD: Gomintj67;
+      DATABASE_NAME: mood
 
-  # flask:
-  #   image: seein/mood_flask:latest
-  #   build:  
-  #     context: ./flask
-  #     dockerfile: Dockerfile
-  #   platform: linux/amd64
-  #   ports:
-  #     - "5001:5001"
-  #   environment:
-  #     - CHECKPOINT_PATH=./checkpoints/checkpoint_epoch_8.pth
+  flask:
+    image: seein/mood_flask:latest
+    build:  
+      context: ./flask
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    ports:
+      - "5001:5001"
+    environment:
+      - CHECKPOINT_PATH=./checkpoints/checkpoint_epoch_8.pth
