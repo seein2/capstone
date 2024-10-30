@@ -47,30 +47,59 @@ class Recommend {
 
     // 추천 콘텐츠 조회
     static async getContent(emotion) {
-        // 특정 감정 랜덤으로 9개 추출
+        // 각 타입별로 따로 쿼리를 실행하여 확실히 각 타입의 컨텐츠를 가져옴
         const sql = `
-        SELECT content_type, title, creator, link
-        FROM contents
-        WHERE emotion_type = ?
-        ORDER BY RAND()
-        LIMIT 9
+            SELECT content_type, title, creator, link
+            FROM content_master
+            WHERE emotion_type = ? AND content_type = ?
+            ORDER BY RAND()
+            LIMIT ?
         `;
 
-        return new Promise((resolve, reject) => {
-            db.query(sql, [emotion], (err, results) => {
-                if (err) reject(err);
-                else {
-                    // 콘텐츠 타입별로 그룹화
-                    const recommendations = {
-                        // 각각 필터링해서 최대 3개 선택.
-                        music: results.filter(r => r.content_type === 'MUSIC').slice(0, 3),
-                        books: results.filter(r => r.content_type === 'BOOK').slice(0, 3),
-                        videos: results.filter(r => r.content_type === 'VIDEO').slice(0, 3)
-                    };
-                    resolve(recommendations);
+        try {
+            const typeConfig = {
+                'MUSIC': 3,
+                'BOOK': 3,
+                'VIDEO': 3
+            };
+            const recommendations = {
+                music: [],
+                books: [],
+                videos: []
+            };
+
+            // 각 타입별로 병렬로 쿼리 실행
+            const results = await Promise.allSettled(
+                Object.entries(typeConfig).map(([type, limit]) =>
+                    new Promise((resolve, reject) => {
+                        db.query(sql, [emotion, type, limit], (err, results) => {
+                            if (err) reject(err);
+                            else resolve({ type, results });
+                        });
+                    })
+                )
+            );
+
+            // 결과를 appropriate 키에 할당
+            results.forEach(({ type, results }) => {
+                switch (type) {
+                    case 'MUSIC':
+                        recommendations.music = results;
+                        break;
+                    case 'BOOK':
+                        recommendations.books = results;
+                        break;
+                    case 'VIDEO':
+                        recommendations.videos = results;
+                        break;
                 }
             });
-        });
+
+            return recommendations;
+        } catch (error) {
+            console.error('Error getting content:', error);
+            throw error;
+        }
     }
 
 
