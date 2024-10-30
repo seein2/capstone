@@ -27,14 +27,14 @@
   - 감정 분석: 파인튜닝된 [KcELECTRA](https://github.com/Beomi/KcELECTRA) 모델
   - 챗봇: OpenAI GPT-4
 - **APIs**:
-- OpenAI API (GPT-4 기반 일기 분석 및 응답 생성)
-- 감정 분석 API (KcELECTRA 기반 감정 분석 서버)
+  - OpenAI API (GPT-4 기반 일기 분석 및 응답 생성)
+  - 감정 분석 API (KcELECTRA 기반 감정 분석 서버)
 - ***DevOps***:
-- Docker
-- Docker Compose
-- 컨테이너화된 서비스:
-  - Node.js 서버 (mood_nodejs)
-  - Python 감정 분석 서버 (mood_flask)
+  - Docker
+  - Docker Compose
+  - 컨테이너화된 서비스:
+    - Node.js 서버 (mood_nodejs)
+    - Python 감정 분석 서버 (mood_flask)
 
 ## 📊 데이터베이스 구조
 ### Users Table
