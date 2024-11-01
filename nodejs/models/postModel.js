@@ -9,7 +9,8 @@ class Post {
         SELECT posts.*, users.community_nickname, users.community_icon,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id) AS likeCount,
             (SELECT COUNT(*) FROM post_likes WHERE postId = posts.id AND userId = ?) AS isLiked,
-            (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount
+            (SELECT COUNT(*) FROM comments WHERE postId = posts.id) AS commentCount,
+            DATE_FORMAT(CONVERT_TZ(posts.created_at, '+00:00', '+00:00'), '%Y-%m-%d %H:%i:%s') AS created_at
         FROM posts
         JOIN users ON posts.userId = users.id
         ORDER BY posts.created_at DESC

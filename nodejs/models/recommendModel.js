@@ -50,7 +50,7 @@ class Recommend {
         // 각 타입별로 따로 쿼리를 실행하여 확실히 각 타입의 컨텐츠를 가져옴
         const sql = `
             SELECT content_type, title, creator, link
-            FROM content_master
+            FROM contents
             WHERE emotion_type = ? AND content_type = ?
             ORDER BY RAND()
             LIMIT ?
