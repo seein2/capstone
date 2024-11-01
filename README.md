@@ -9,9 +9,9 @@
 - 분석된 감정을 수치화하여 시각화
 - GPT-4 기반의 맞춤형 코멘트 제공
 
-### 2. 맞춤형 컨텐츠 추천
+### 2. 맞춤형 컨텐츠 제공
 - 주간 감정 변화 추이 분석
-- 주요 감정에 따른 맞춤형 컨텐츠 추천
+- 주요 감정에 따른 맞춤형 컨텐츠 제공
   - 음악 추천
   - 도서 추천
   - 영상 추천
@@ -21,7 +21,7 @@
 - 좋아요,댓글,검색 기능
 
 ## 🛠 기술 스택
-- **Backend**: Node.js, flask
+- **Backend**: Node.js, Flask
 - **Database**: MySQL
 - **AI**:
   - 감정 분석: 파인튜닝된 [KcELECTRA](https://github.com/Beomi/KcELECTRA) 모델
@@ -84,7 +84,7 @@ GET /profile/profile - 프로필 정보
 PUT /profile/profile/edit - 프로필 수정
 ```
 
-## 🏄🏻‍♂️주요 기능별 처리 흐름
+## 🏄🏻‍♂️ 주요 기능별 처리 흐름
 
 1. **일기 작성 및 분석**
    - 사용자 일기 작성 → 감정 분석 (KcELECTRA) → GPT-4 코멘트 생성 → 결과 저장 및 반환
