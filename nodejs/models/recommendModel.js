@@ -47,59 +47,42 @@ class Recommend {
 
     // 추천 콘텐츠 조회
     static async getContent(emotion) {
-        // 각 타입별로 따로 쿼리를 실행하여 확실히 각 타입의 컨텐츠를 가져옴
         const sql = `
-            SELECT content_type, title, creator, link
-            FROM contents
-            WHERE emotion_type = ? AND content_type = ?
-            ORDER BY RAND()
-            LIMIT ?
-        `;
+                SELECT content_type, title, creator, link 
+                FROM content_master 
+                WHERE emotion_type = ? 
+                AND content_type = ? 
+                ORDER BY RAND() 
+                LIMIT 3
+            `;
 
-        try {
-            const typeConfig = {
-                'MUSIC': 3,
-                'BOOK': 3,
-                'VIDEO': 3
-            };
-            const recommendations = {
-                music: [],
-                books: [],
-                videos: []
-            };
-
-            // 각 타입별로 병렬로 쿼리 실행
-            const results = await Promise.allSettled(
-                Object.entries(typeConfig).map(([type, limit]) =>
-                    new Promise((resolve, reject) => {
-                        db.query(sql, [emotion, type, limit], (err, results) => {
-                            if (err) reject(err);
-                            else resolve({ type, results });
-                        });
-                    })
-                )
-            );
-
-            // 결과를 appropriate 키에 할당
-            results.forEach(({ type, results }) => {
-                switch (type) {
-                    case 'MUSIC':
-                        recommendations.music = results;
-                        break;
-                    case 'BOOK':
-                        recommendations.books = results;
-                        break;
-                    case 'VIDEO':
-                        recommendations.videos = results;
-                        break;
-                }
+        // 각 타입별 데이터 조회
+        const music = await new Promise((resolve, reject) => {
+            db.query(sql, [emotion, 'MUSIC'], (err, results) => {
+                if (err) reject(err);
+                resolve(results);
             });
+        });
 
-            return recommendations;
-        } catch (error) {
-            console.error('Error getting content:', error);
-            throw error;
-        }
+        const books = await new Promise((resolve, reject) => {
+            db.query(sql, [emotion, 'BOOK'], (err, results) => {
+                if (err) reject(err);
+                resolve(results);
+            });
+        });
+
+        const videos = await new Promise((resolve, reject) => {
+            db.query(sql, [emotion, 'VIDEO'], (err, results) => {
+                if (err) reject(err);
+                resolve(results);
+            });
+        });
+
+        return {
+            music: music,
+            books: books,
+            videos: videos
+        };
     }
 
 
