@@ -197,7 +197,7 @@ class Post {
     })
   }
 
-  static search(keyword) {
+  static search(keyword, userId) {
     return new Promise((resolve, reject) => {
       const sql = `
       SELECT *, users.community_nickname, users.community_icon,
@@ -212,7 +212,7 @@ class Post {
       ORDER BY created_at DESC
       `;
       const searchKeyword = `%${keyword}%`;
-      db.query(sql, [searchKeyword, searchKeyword], (err, results) => {
+      db.query(sql, [userId, searchKeyword, searchKeyword], (err, results) => {
         if (err) reject(err);
         else resolve(results);
       });
