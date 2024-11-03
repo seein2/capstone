@@ -49,7 +49,7 @@ class Recommend {
     static async getContent(emotion) {
         const sql = `
                 SELECT content_type, title, creator, link 
-                FROM content_master 
+                FROM contents
                 WHERE emotion_type = ? 
                 AND content_type = ? 
                 ORDER BY RAND() 
