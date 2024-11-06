@@ -214,7 +214,13 @@ class Post {
       const searchKeyword = `%${keyword}%`;
       db.query(sql, [userId, searchKeyword, searchKeyword], (err, results) => {
         if (err) reject(err);
-        else resolve(results);
+
+        const transformedResults = results.map(post => ({
+          ...post,
+          isLiked: post.isLiked > 0, // 좋아요 여부를 boolean으로 변환
+        }));
+
+        resolve(transformedResults);
       });
     });
   }
