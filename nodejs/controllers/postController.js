@@ -89,10 +89,11 @@ exports.getMyPosts = async (req, res) => {
 exports.searchPosts = async (req, res) => {
   try {
     const keyword = req.query.keyword;
+    const userId = req.user.id;
     if (!keyword || keyword.trim().length === 0) {
       return res.status(400).json({ error: '유효한 검색어를 입력해주세요.' });
     }
-    const result = await Post.search(keyword);
+    const result = await Post.search(keyword, userId);
     res.json(result);
   } catch (err) {
     console.error('게시물 검색 오류: ', err);
