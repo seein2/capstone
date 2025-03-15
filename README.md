@@ -67,21 +67,45 @@
 
 ## 🔍 주요 API 엔드포인트
 ```
-POST /diary/analyze - 일기 작성 및 코멘트 반환
+다이어리 관련 엔드포인트
+POST /diary/analyze - 일기 작성 및 분석 결과 반환
 GET /diary/diaries/:userId - 특정 날짜의 일기 조회
 GET /diary/diaries - 전체 일기 목록 조회
+PUT /diary/diaries/update/:diaryId - 일기 수정
+DELETE /diary/diaries/delete/:diaryId - 일기 삭제
 
-GET /recommend - 맞춤 컨텐츠 추천
-GET /recommend/getrecommend - 감정 변화 추이 조회
+추천 관련 엔드포인트
+POST /recommend - 맞춤 컨텐츠 추천 받기
+GET /recommend/getrecommend - 최근 추천 컨텐츠 조회
 
-POST /community/create - 게시글 작성
-GET /community/posts - 게시글 목록 조회
-PUT /community/posts/:id - 게시글 수정
-DELETE /community/posts/:id - 게시글 삭제
-POST /community/posts/:id/like - 게시글 좋아요 및 취소
+커뮤니티 관련 엔드포인트
+POST /post/create - 게시글 작성
+GET /post/posts - 게시글 목록 조회
+PUT /post/posts/:id - 게시글 수정
+DELETE /post/posts/:id - 게시글 삭제
+POST /post/posts/:id/like - 게시글 좋아요 및 취소
+GET /post/my-posts - 내가 작성한 게시물 목록 조회
+GET /post/posts/search - 게시물 검색
 
-GET /profile/profile - 프로필 정보
+댓글 관련 엔드포인트
+GET /comment/posts/:postId/comments - 게시글의 댓글 조회
+POST /comment/posts/:postId/comments - 댓글 작성
+PUT /comment/comments/:id - 댓글 수정
+DELETE /comment/comments/:id - 댓글 삭제
+POST /comment/comments/:id/like - 댓글 좋아요 및 취소
+
+프로필 관련 엔드포인트
+GET /profile/user-info - 사용자 정보 확인
+GET /profile/profile - 프로필 정보 조회
+GET /profile/profile/setup - 프로필 설정 페이지
+POST /profile/profile/setup - 프로필 설정 처리
 PUT /profile/profile/edit - 프로필 수정
+
+인증 관련 엔드포인트
+POST /auth/kakao/callback - 카카오 인증 콜백
+POST /auth/verify-token - 토큰 검증
+POST /auth/logout - 로그아웃
+DELETE /auth/delete-account - 회원 탈퇴
 ```
 
 ## 🏄🏻‍♂️ 주요 기능별 처리 흐름
